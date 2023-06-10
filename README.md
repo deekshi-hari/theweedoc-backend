@@ -9,7 +9,7 @@ git clone
 2. Setting
 
 ```
-cd faya_ecomm
+cd weedoc-backend
 python3 -m venv env
 (For Linux) source env/bin/activate
 (For Windows) env\Scripts\activate
