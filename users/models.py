@@ -9,3 +9,10 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.email} -- {self.pk}"
+    
+
+# class UserOTP(models.Model):
+#     email = models.EmailField(blank=True)
+#     phone_number = models.CharField(blank=True)
+#     otp = models.PositiveBigIntegerField()
+    
