@@ -65,10 +65,10 @@ class UserDeleteView(generics.DestroyAPIView):
         return self.destroy(request, *args, **kwargs)
     
 
-from .services import send_sms    
-class SendSMS(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = MyTokenObtainPairSerializer
-    def post(self, request, *args, **kwargs):
-        send_sms('+919633854889', 'OTP: 667892')
-        return Response({'sucess':'message sucess'})
+# from .services import send_sms    
+# class SendSMS(generics.CreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = MyTokenObtainPairSerializer
+#     def post(self, request, *args, **kwargs):
+#         send_sms('+919633854889', 'OTP: 667892')
+#         return Response({'sucess':'message sucess'})

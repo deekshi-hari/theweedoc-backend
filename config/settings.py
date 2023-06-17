@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-n%oc-uodtr6^i(m_-5sk(%%xvear&xr2!1fe!hsyy!9-53pj2z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['206.189.142.218']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -140,6 +140,6 @@ REST_FRAMEWORK = {
 }
 
 #TWILLO CONFIG
-TWILIO_ACCOUNT_SID = ''
-TWILIO_AUTH_TOKEN = ''
-TWILIO_PHONE_NUMBER = '+918129012852'
+# TWILIO_ACCOUNT_SID = ''
+# TWILIO_AUTH_TOKEN = ''
+# TWILIO_PHONE_NUMBER = '+918129012852'
