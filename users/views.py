@@ -2,13 +2,21 @@ from django.shortcuts import render
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework.permissions import AllowAny
 from .models import User
-from .serializers import RegisterSerializer, UserUpdateSerializer
+from .serializers import RegisterSerializer, UserUpdateSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .permessions import IsAdmin
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+
 
 
 class MyObtainTokenPairView(generics.CreateAPIView):
@@ -70,3 +78,64 @@ class UserDeleteView(generics.DestroyAPIView):
     
 #     def post(self, request, *args, **kwargs):
 #         return Response({'sucess':'message sucess'})
+
+class PasswordResetView(generics.GenericAPIView):
+    serializer_class = PasswordResetSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data['email']
+        user = get_object_or_404(User, email=email)
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.id))
+        print('*******************************************')
+        print(user.pk)
+        print(uid)
+        current_site = get_current_site(request)
+        mail_subject = 'Password Reset'
+        message = render_to_string(
+            'password_reset_email.html',
+            {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': uid,
+                'token': token,
+            }
+        )
+        email = EmailMessage(mail_subject, message, to=[email])
+        email.send()
+
+        return Response(
+            {'detail': 'Password reset email has been sent'},
+            status=status.HTTP_200_OK
+        )
+    
+
+class PasswordResetConfirmView(generics.GenericAPIView):
+    serializer_class = PasswordResetConfirmSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data['token']
+        password = serializer.validated_data['password']
+
+        uid = force_str(urlsafe_base64_decode(request.data['uid']))
+        user = get_object_or_404(User, pk=uid)
+
+        if default_token_generator.check_token(user, token):
+            user.set_password(password)
+            user.save()
+            return Response(
+                {'detail': 'Password has been reset successfully'},
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            {'detail': 'Invalid reset token'},
+            status=status.HTTP_400_BAD_REQUEST
+        )

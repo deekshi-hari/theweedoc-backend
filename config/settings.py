@@ -143,3 +143,10 @@ REST_FRAMEWORK = {
 # TWILIO_ACCOUNT_SID = ''
 # TWILIO_AUTH_TOKEN = ''
 # TWILIO_PHONE_NUMBER = '+918129012852'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'deekhari00716@gmail.com '
+EMAIL_HOST_PASSWORD = 'oxlwzyfejrgoutdd'
+EMAIL_PORT = 587
