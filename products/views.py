@@ -10,7 +10,7 @@ from users.cloudinary_utils import upload_files
 
 # # Create your views here.
 class ProductListAPIView(generics.ListAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.filter(is_active=True)
     permission_classes = (AllowAny,)
     serializer_class = ProductSerializer
 
@@ -21,18 +21,26 @@ class ProductCreateView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         request.data['customer'] = request.user.id
-        image = request.FILES['image']
-        video = request.FILES['video']
-        image_url = f'weedoc/{request.data["title"]}/image'
-        video_url = f'weedoc/{request.data["title"]}/video'
-        resulted_image_url = upload_files(image, image_url, 'image')
-        resulted_video_url = upload_files(video, video_url, 'video')
-        request.data['image'] = resulted_image_url
-        request.data['video'] = resulted_video_url
+        request.data['image'] = ""
+        request.data['video'] = ""
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            image = request.FILES['image']
+            video = request.FILES['video']
+            title = request.data["title"]
+            image_url = f'weedoc/{title.replace(" ", "_")}/image'
+            video_url = f'weedoc/{title.replace(" ", "_")}/video'
+            resulted_image_url = upload_files(image, image_url, 'image')
+            resulted_video_url = upload_files(video, video_url, 'video')
+            request.data['image'] = resulted_image_url
+            request.data['video'] = resulted_video_url
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 

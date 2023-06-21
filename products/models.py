@@ -6,17 +6,17 @@ from django.utils import timezone
 class Product(models.Model):
 
     Gener_choice = [ 
-        ('COMEDY','comedy'),
-        ('ACTION','action'),
-        ('DRAMA','drama'),
-        ('HORROR','horror'),
+        ('comedy', 'COMEDY'),
+        ('action', 'ACTION'),
+        ('drama', 'DRAMA'),
+        ('horror', 'HORROR'),
       ]
 
     Language_choice = [
-        ('malayalam','MALAYALAM'),
-        ('english','ENGLISH'),
-        ('tamil','TAMIL'),
-        ('hindi','HINDI'),
+        ('malayalam', 'MALAYALAM'),
+        ('english', 'ENGLISH'),
+        ('tamil', 'TAMIL'),
+        ('hindi', 'HINDI'),
         ]
 
     title = models.CharField(max_length=200, unique=True)
@@ -26,4 +26,4 @@ class Product(models.Model):
     genere = models.CharField(choices=Gener_choice, max_length=200, default='comedy')
     customer = models.ForeignKey(User, on_delete=models.CharField)
     is_active = models.BooleanField(default=False)
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
