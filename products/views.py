@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Product
 from .serializers import ProductSerializer
 from users.cloudinary_utils import upload_files
+from django.http import QueryDict
 
 
 # # Create your views here.
@@ -20,7 +21,8 @@ class ProductCreateView(generics.CreateAPIView):
     serializer_class = ProductSerializer
 
     def post(self, request, *args, **kwargs):
-        data = request.data
+        data = QueryDict('', mutable=True)
+        data.update(request.data)
         data['customer'] = request.user.id
         data['image'] = ""
         data['video'] = ""
