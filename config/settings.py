@@ -153,8 +153,14 @@ EMAIL_HOST_USER = 'deekhari00716@gmail.com '
 EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 587
 
-cloudinary.config( 
-  cloud_name = "dwku5ukpm", 
-  api_key = "515322649859362", 
-  api_secret = "-zYgpYW6nSGZjR2AC1kjeoJ6R3o" 
-)
+# cloudinary.config( 
+#   cloud_name = "dwku5ukpm", 
+#   api_key = "515322649859362", 
+#   api_secret = "-zYgpYW6nSGZjR2AC1kjeoJ6R3o" 
+# )
+
+CLOUDINARY = {
+    'cloud_name': 'dwku5ukpm',
+    'api_key': '515322649859362',
+    'api_secret': '-zYgpYW6nSGZjR2AC1kjeoJ6R3o',
+}

@@ -19,7 +19,7 @@ class Product(models.Model):
         ('hindi','HINDI'),
         ]
 
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, unique=True)
     language = models.CharField(choices=Language_choice, max_length=200, default='malayalam')
     image = models.CharField(max_length=500, blank=True)
     video = models.CharField(max_length=500, blank=True)
