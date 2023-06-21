@@ -1,17 +1,17 @@
-# from django.shortcuts import render
-# from rest_framework import generics, status
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from rest_framework.permissions import AllowAny, IsAuthenticated
-# from .models import Product
-# from .serializers import ProductSerializer
+from django.shortcuts import render
+from rest_framework import generics, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .models import Product
+from .serializers import ProductSerializer
 
 
 # # Create your views here.
-# class ProductListAPIView(generics.ListAPIView):
-#     queryset = Product.objects.all()
-#     permission_classes = (AllowAny,)
-#     serializer_class = ProductSerializer
+class ProductListAPIView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = ProductSerializer
 
 
 # class ProductCreateView(generics.CreateAPIView):
