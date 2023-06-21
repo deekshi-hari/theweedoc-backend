@@ -2,35 +2,28 @@ from django.db import models
 from users.models import User
 from django.utils import timezone
 
-# CATEGORY_CHOICES = [
-#     ('mobile', 'Mobile'),
-#     ('laptop', 'Laptop'),
-#     ('tablet', 'Tablet'),
-#     ('earphone', 'Ear Phone'),
-#     ('earpods', 'Ear Pods'),
-#     ('gameing_console', 'Gameing Console'),
-# ]
 
-# class Product(models.Model):
-#     customer = models.ForeignKey(User, on_delete=models.CASCADE)
-#     name = models.CharField(max_length=100)
-#     price = models.PositiveIntegerField()
-#     image = models.ImageField(upload_to='templates/product_images')
-#     category = models.CharField(choices=CATEGORY_CHOICES, max_length=50)
-#     is_active = models.BooleanField(default=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
+class Product(models.Model):
 
-#     def __str__(self):
-#         return f'{self.name} -- {self.pk}'
+    Gener_choice = [ 
+        ('COMEDY','comedy'),
+        ('ACTION','action'),
+        ('DRAMA','drama'),
+        ('HORROR','horror'),
+      ]
 
-#     def is_registered_before_two_months(self):
-#         two_months_ago = timezone.now() - timezone.timedelta(days=60)
-#         if self.created_at == None:
-#             return False
-#         return self.created_at < two_months_ago
+    Language_choice = [
+        ('malayalam','MALAYALAM'),
+        ('english','ENGLISH'),
+        ('tamil','TAMIL'),
+        ('hindi','HINDI'),
+        ]
 
-#     def save(self, *args, **kwargs):
-#         # Check if the product is registered before two months and make it inactive
-#         if self.is_registered_before_two_months():
-#             self.is_active = False
-#         super(Product, self).save(*args, **kwargs)
+    title = models.CharField(max_length=200)
+    language = models.CharField(choices=Language_choice, max_length=200, default='malayalam')
+    image = models.CharField(max_length=500)
+    video = models.CharField(max_length=500)
+    genere = models.CharField(choices=Gener_choice, max_length=200, default='comedy')
+    customer = models.ForeignKey(User, on_delete=models.CharField)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateField(auto_now_add=True)
