@@ -20,10 +20,11 @@ class ProductCreateView(generics.CreateAPIView):
     serializer_class = ProductSerializer
 
     def post(self, request, *args, **kwargs):
-        request.data['customer'] = request.user.id
-        request.data['image'] = ""
-        request.data['video'] = ""
-        serializer = self.serializer_class(data=request.data)
+        data = request.data
+        data['customer'] = request.user.id
+        data['image'] = ""
+        data['video'] = ""
+        serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             image = request.FILES['image']
             video = request.FILES['video']
@@ -32,9 +33,9 @@ class ProductCreateView(generics.CreateAPIView):
             video_url = f'weedoc/{title.replace(" ", "_")}/video'
             resulted_image_url = upload_files(image, image_url, 'image')
             resulted_video_url = upload_files(video, video_url, 'video')
-            request.data['image'] = resulted_image_url
-            request.data['video'] = resulted_video_url
-            serializer = self.serializer_class(data=request.data)
+            data['image'] = resulted_image_url
+            data['video'] = resulted_video_url
+            serializer = self.serializer_class(data=data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
