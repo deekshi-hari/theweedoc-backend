@@ -90,9 +90,6 @@ class PasswordResetView(generics.GenericAPIView):
 
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.id))
-        print('*******************************************')
-        print(user.pk)
-        print(uid)
         current_site = get_current_site(request)
         mail_subject = 'Password Reset'
         message = render_to_string(
@@ -100,7 +97,7 @@ class PasswordResetView(generics.GenericAPIView):
             {
                 'user': user,
                 'domain': current_site.domain,
-                'uid': uid,
+                'uid': str(uid),
                 'token': token,
             }
         )
