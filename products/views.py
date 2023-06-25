@@ -11,7 +11,6 @@ from .pagination import FilterPagination
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-# # Create your views here.
 class ProductListAPIView(generics.ListAPIView):
     queryset = Product.objects.filter(is_active=True).order_by('-created_at')
     permission_classes = (AllowAny,)
@@ -20,7 +19,6 @@ class ProductListAPIView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['genere']
     search_fields = ['title', 'description']
-
 
 
 class ProductCreateView(generics.CreateAPIView):
