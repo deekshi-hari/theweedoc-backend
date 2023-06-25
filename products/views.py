@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Product, Genere
-from .serializers import ProductSerializer, GenereSerializer
+from .serializers import *
 from users.cloudinary_utils import upload_files
 from django.http import QueryDict
 from .pagination import FilterPagination
@@ -14,7 +14,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 class ProductListAPIView(generics.ListAPIView):
     queryset = Product.objects.filter(is_active=True).order_by('-created_at')
     permission_classes = (AllowAny,)
-    serializer_class = ProductSerializer
+    serializer_class = ProductRetriveSerializer
     pagination_class = FilterPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['genere']
@@ -23,7 +23,7 @@ class ProductListAPIView(generics.ListAPIView):
 
 class ProductCreateView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated, )
-    serializer_class = ProductSerializer
+    serializer_class = ProductCreateSerializer
 
     def post(self, request, *args, **kwargs):
         data = QueryDict('', mutable=True)
@@ -58,7 +58,7 @@ class ProductCreateView(generics.CreateAPIView):
 
 class GenereListView(generics.ListAPIView):
     queryset = Genere.objects.all()
-    serializer_class = GenereSerializer
+    serializer_class = GenereRetriveSerializer
     permission_classes = (AllowAny,)
 
     
