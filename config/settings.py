@@ -164,3 +164,5 @@ CLOUDINARY = {
     'api_key': '515322649859362',
     'api_secret': '-zYgpYW6nSGZjR2AC1kjeoJ6R3o',
 }
+
+CORS_ORIGIN_ALLOW_ALL = True

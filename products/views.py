@@ -29,7 +29,6 @@ class ProductDetailView(generics.RetrieveAPIView):
     lookup_url_kwarg = 'product_id'
 
 
-
 class ProductCreateView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = ProductCreateSerializer
