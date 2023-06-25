@@ -168,3 +168,7 @@ CLOUDINARY = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITELIST = [
+    'https://jellyfish-app-7fj7c.ondigitalocean.app/',
+]
