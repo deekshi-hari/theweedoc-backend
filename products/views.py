@@ -21,6 +21,15 @@ class ProductListAPIView(generics.ListAPIView):
     search_fields = ['title', 'description']
 
 
+class ProductDetailView(generics.RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    queryset = Product.objects.all()
+    serializer_class = ProductRetriveSerializer
+    lookup_field = 'id'
+    lookup_url_kwarg = 'product_id'
+
+
+
 class ProductCreateView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = ProductCreateSerializer
