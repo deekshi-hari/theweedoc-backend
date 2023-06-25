@@ -10,6 +10,9 @@ def upload_files(file, folder_name, _type):
     )
     if _type == 'video':
         result = upload(file, folder=folder_name, resource_type=_type)
+        duration = result.get("duration")
+        return [result['secure_url'], duration]
+        
     else:
         result = upload(file, folder=folder_name)
-    return result['secure_url']
+        return result['secure_url']

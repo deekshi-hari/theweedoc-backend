@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -7,13 +7,20 @@ from .models import Product
 from .serializers import ProductSerializer
 from users.cloudinary_utils import upload_files
 from django.http import QueryDict
+from .pagination import FilterPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 # # Create your views here.
 class ProductListAPIView(generics.ListAPIView):
-    queryset = Product.objects.filter(is_active=True)
+    queryset = Product.objects.filter(is_active=True).order_by('-created_at')
     permission_classes = (AllowAny,)
     serializer_class = ProductSerializer
+    pagination_class = FilterPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['genere']
+    search_fields = ['title', 'description']
+
 
 
 class ProductCreateView(generics.CreateAPIView):
@@ -36,7 +43,8 @@ class ProductCreateView(generics.CreateAPIView):
             resulted_image_url = upload_files(image, image_url, 'image')
             resulted_video_url = upload_files(video, video_url, 'video')
             data['image'] = resulted_image_url
-            data['video'] = resulted_video_url
+            data['video'] = resulted_video_url[0]
+            data['duration'] = resulted_video_url[1]
             serializer = self.serializer_class(data=data)
             if serializer.is_valid():
                 serializer.save()
