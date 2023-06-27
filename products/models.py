@@ -8,6 +8,15 @@ class Genere(models.Model):
     updated_at = models.DateTimeField('updated_at', auto_now=True, blank=True, null=True)
 
 
+class ProductManagerActive(models.Manager):
+
+    def get_is_active(self):
+        return self.filter(is_active=True).order_by('-created_at')
+    
+    def get_inactive(self):
+        return self.filter(is_active=False).order_by('-created_at')
+    
+
 class Product(models.Model):
 
     Language_choice = [
@@ -29,3 +38,6 @@ class Product(models.Model):
     is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField('updated_at', auto_now=True, blank=True, null=True)
+
+    objects = models.Manager()  # The default manager
+    custom_objects = ProductManagerActive()

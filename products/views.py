@@ -12,7 +12,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 class ProductListAPIView(generics.ListAPIView):
-    queryset = Product.objects.filter(is_active=True).order_by('-created_at')
+    # queryset = Product.objects.filter(is_active=True).order_by('-created_at')
+    queryset = Product.custom_objects.get_is_active()
     permission_classes = (AllowAny,)
     serializer_class = ProductRetriveSerializer
     pagination_class = FilterPagination

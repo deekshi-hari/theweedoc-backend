@@ -169,9 +169,9 @@ CLOUDINARY = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ORIGIN_WHITELIST = [
-    'https://jellyfish-app-7fj7c.ondigitalocean.app/',
-]
+# CORS_ORIGIN_WHITELIST = [
+#     'https://jellyfish-app-7fj7c.ondigitalocean.app/',
+# ]
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500MB
