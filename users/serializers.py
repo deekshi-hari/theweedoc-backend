@@ -27,6 +27,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'error': "email or phonenumber required"})
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"error": "Password fields didn't match."})
+        if attrs['phone_number'] != "" and User.objects.filter(phone_number=attrs['phone_number']).exists():
+             raise serializers.ValidationError({"error": "Phone number exists"})
         return attrs
 
     def create(self, validated_data):
