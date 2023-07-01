@@ -38,6 +38,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             phone_number=validated_data['phone_number'],
         )
         user.set_password(validated_data['password'])
+        user.is_active = False
         user.save()
         return user
 
