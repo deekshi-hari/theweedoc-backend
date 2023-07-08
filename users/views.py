@@ -115,10 +115,8 @@ class PasswordResetConfirmView(generics.GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         token = serializer.validated_data['token']
         password = serializer.validated_data['password']
-
         uid = force_str(urlsafe_base64_decode(request.data['uid']))
         user = get_object_or_404(User, pk=uid)
 
@@ -134,3 +132,14 @@ class PasswordResetConfirmView(generics.GenericAPIView):
             {'detail': 'Invalid reset token'},
             status=status.HTTP_400_BAD_REQUEST
         )
+    
+
+class UserNameValidateView(generics.GenericAPIView):
+
+    serializer_class = UserUpdateSerializer
+
+    def post(self, request, *args, **kwargs):
+        user_name = request.data['username']
+        if User.objects.filter(username=user_name).exists():
+            return Response({'data': 'username exist'})
+        return Response({'data': 'valid username'})

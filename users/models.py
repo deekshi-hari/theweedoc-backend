@@ -6,7 +6,16 @@ from django.contrib.auth.models import AbstractUser
 #     name = models.CharField(max_length=100)
 
 class User(AbstractUser):
+
+    USERTYPE = [
+        ('admin', 'ADMIN'),
+        ('superadmin', 'SUPERADMIN'),
+        ('user', 'USER'),
+        ]
+    
     phone_number = models.CharField(max_length=13, blank=True, null=True)
+    user_type = models.CharField(max_length=50, choices=USERTYPE, default='user')
+    followers = models.ManyToManyField('self', related_name='following', symmetrical=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
 
