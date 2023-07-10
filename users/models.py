@@ -15,9 +15,18 @@ class User(AbstractUser):
     
     phone_number = models.CharField(max_length=13, blank=True, null=True)
     user_type = models.CharField(max_length=50, choices=USERTYPE, default='user')
-    followers = models.ManyToManyField('self', related_name='following', symmetrical=False)
+    followers = models.ManyToManyField('self', related_name='following', symmetrical=False, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
+
+    def follow(self, user):
+        self.followers.add(user)
+
+    def unfollow(self, user):
+        self.followers.remove(user)
+
+    def is_following(self, user):
+        return self.followers.filter(pk=user.pk).exists()
 
     def __str__(self):
         return f"{self.email} -- {self.pk}"

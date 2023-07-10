@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from .serializers import MyTokenObtainPairSerializer
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import User
-from .serializers import RegisterSerializer, UserUpdateSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer
+from .serializers import RegisterSerializer, UserUpdateSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, \
+                            UserSerializer
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -29,6 +30,9 @@ class MyObtainTokenPairView(generics.CreateAPIView):
             return Response({'error': 'username is invalid'}, status=status.HTTP_404_NOT_FOUND)
         if check_password(request.data['password'], user.password):
             token, created = Token.objects.get_or_create(user=user)
+            if user.is_active == False:
+                user.is_active = True
+                user.save()
             return Response({'token': token.key})
         else:
             return Response({'error': 'password is invalid'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -135,7 +139,6 @@ class PasswordResetConfirmView(generics.GenericAPIView):
     
 
 class UserNameValidateView(generics.GenericAPIView):
-
     serializer_class = UserUpdateSerializer
 
     def post(self, request, *args, **kwargs):
@@ -143,3 +146,18 @@ class UserNameValidateView(generics.GenericAPIView):
         if User.objects.filter(username=user_name).exists():
             return Response({'data': 'username exist'})
         return Response({'data': 'valid username'})
+
+
+class FollowUser(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, *args, **Kwargs):
+        user = User.objects.get(id=request.user.id)
+        user_to_folow = User.objects.get(username=request.data['username'])
+        if user.is_following(user_to_folow):
+            user.unfollow(user_to_folow)
+            return Response({'sucess': 'unfollowed'})
+        user.follow(user_to_folow)
+        return Response({'sucess': 'followed'})
+
