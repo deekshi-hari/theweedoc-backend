@@ -41,6 +41,7 @@ class ProductCreateView(generics.CreateAPIView):
         data['image'] = ""
         data['video'] = ""
         data['genere'] = 1
+        data['cast'] = 1
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             image = request.FILES['image']
@@ -56,8 +57,10 @@ class ProductCreateView(generics.CreateAPIView):
             serializer = self.serializer_class(data=data)
             if serializer.is_valid():
                 geners = Genere.objects.filter(id__in=list(eval(request.data['genere'])))
+                casts = User.objects.filter(id__in=list(eval(request.data['cast'])))
                 product =  serializer.save()
                 product.genere.set(geners)
+                product.cast.set(casts)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

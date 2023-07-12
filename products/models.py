@@ -36,6 +36,7 @@ class Product(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CharField)
     age = models.CharField(max_length=50, blank=True, null=True)
     is_active = models.BooleanField(default=False)
+    cast = models.ManyToManyField(User, related_name='users', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField('updated_at', auto_now=True, blank=True, null=True)
 
