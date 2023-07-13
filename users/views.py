@@ -17,6 +17,8 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+from django.http import QueryDict
+from .cloudinary_utils import upload_files
 
 
 class MyObtainTokenPairView(generics.CreateAPIView):
@@ -44,23 +46,23 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 
-class UserUpdateView(generics.UpdateAPIView):
-    permission_classes = (IsAdmin,) #custom permession class
-    serializer_class = UserUpdateSerializer
-    queryset = User.objects.all()
+# class UserUpdateView(generics.UpdateAPIView):
+#     permission_classes = (IsAdmin,) #custom permession class
+#     serializer_class = UserUpdateSerializer
+#     queryset = User.objects.all()
 
-    def update(self, request, *args, **kwargs):
-        if 'username' in request.data:
-            return Response({'error': 'username cannot be updated'}, status=status.HTTP_403_FORBIDDEN)
-        try:
-            user = self.get_object()
-            serializer = UserUpdateSerializer(user, partial=True, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except:
-            return Response({'error': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
+#     def update(self, request, *args, **kwargs):
+#         if 'username' in request.data:
+#             return Response({'error': 'username cannot be updated'}, status=status.HTTP_403_FORBIDDEN)
+#         try:
+#             user = self.get_object()
+#             serializer = UserUpdateSerializer(user, partial=True, data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         except:
+#             return Response({'error': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class UserDeleteView(generics.DestroyAPIView):
@@ -160,4 +162,31 @@ class FollowUser(generics.GenericAPIView):
             return Response({'sucess': 'unfollowed'})
         user.follow(user_to_folow)
         return Response({'sucess': 'followed'})
+
+
+class UserUpdateView(generics.UpdateAPIView):
+    permission_classes = (IsAuthenticated, ) #custom permession class
+    serializer_class = UserUpdateSerializer
+    queryset = User.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        data = QueryDict('', mutable=True)
+        data.update(request.data)
+        data['profile_pic'] = ""
+        data['designation'] = request.data['designation']
+        data['first_name'] = request.data['first_name']
+        data['last_name'] = request.data['last_name']
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            profile_pic = request.FILES['profile_pic']
+            image_url = f'weedoc/profilepic/{data["first_name"]+str(request.user.id)}/'
+            resulted_image_url = upload_files(profile_pic, image_url, 'image')
+            data['profile_pic'] = resulted_image_url
+            serializer = self.serializer_class(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 

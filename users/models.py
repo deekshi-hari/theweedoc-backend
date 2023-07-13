@@ -15,6 +15,8 @@ class User(AbstractUser):
     
     phone_number = models.CharField(max_length=13, blank=True, null=True)
     user_type = models.CharField(max_length=50, choices=USERTYPE, default='user')
+    profile_pic = models.CharField(max_length=700, blank=True, null=True)
+    designation = models.CharField(max_length=50, blank=True, null=True)
     followers = models.ManyToManyField('self', related_name='following', symmetrical=False, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
