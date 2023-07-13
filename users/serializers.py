@@ -45,11 +45,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-# class UserUpdateSerializer(serializers.ModelSerializer):
+class UsernameValidateSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         model = User
-#         fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number')
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number')
 
 
 class PasswordResetSerializer(serializers.Serializer):
@@ -73,3 +73,10 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'designation', 'profile_pic']
+
+
+class UserSearchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'profile_pic']

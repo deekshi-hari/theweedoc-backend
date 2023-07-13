@@ -2,9 +2,9 @@ from django.shortcuts import render
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import User
-from .serializers import RegisterSerializer, UserUpdateSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, \
-                            UserSerializer
-from rest_framework import generics, status
+from .serializers import RegisterSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, \
+                            UserSerializer, UserSearchSerializer, UserUpdateSerializer, UsernameValidateSerializer
+from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -19,6 +19,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.http import QueryDict
 from .cloudinary_utils import upload_files
+from products.pagination import FilterPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class MyObtainTokenPairView(generics.CreateAPIView):
@@ -65,17 +67,17 @@ class RegisterView(generics.CreateAPIView):
 #             return Response({'error': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
-class UserDeleteView(generics.DestroyAPIView):
-    permission_classes = (IsAdmin,)
-    serializer_class = RegisterSerializer
-    queryset = User.objects.all()
+# class UserDeleteView(generics.DestroyAPIView):
+#     permission_classes = (IsAdmin,)
+#     serializer_class = RegisterSerializer
+#     queryset = User.objects.all()
 
-    def delete(self, request, *args, **kwargs):
-        try:
-            user = User.objects.get(pk=self.kwargs['pk'])
-        except User.DoesNotExist:
-            return Response({'error': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
-        return self.destroy(request, *args, **kwargs)
+#     def delete(self, request, *args, **kwargs):
+#         try:
+#             user = User.objects.get(pk=self.kwargs['pk'])
+#         except User.DoesNotExist:
+#             return Response({'error': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
+#         return self.destroy(request, *args, **kwargs)
     
 
 # from .services import send_sms    
@@ -141,7 +143,7 @@ class PasswordResetConfirmView(generics.GenericAPIView):
     
 
 class UserNameValidateView(generics.GenericAPIView):
-    serializer_class = UserUpdateSerializer
+    serializer_class = UsernameValidateSerializer
 
     def post(self, request, *args, **kwargs):
         user_name = request.data['username']
@@ -182,11 +184,23 @@ class UserUpdateView(generics.UpdateAPIView):
             image_url = f'weedoc/profilepic/{data["first_name"]+str(request.user.id)}/'
             resulted_image_url = upload_files(profile_pic, image_url, 'image')
             data['profile_pic'] = resulted_image_url
-            serializer = self.serializer_class(data=data)
+            user = User.objects.get(id=request.user.id)
+            serializer = self.serializer_class(user, partial=True, data=data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class UserSearchView(generics.ListAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = UserSearchSerializer
+    queryset = User.objects.all()
+    pagination_class = FilterPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username', 'first_name', 'last_name']
+
+
         
 
