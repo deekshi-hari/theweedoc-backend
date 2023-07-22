@@ -9,4 +9,7 @@ urlpatterns = [
     # path('products/update/<int:pk>/', ProductUpdateView.as_view(), name='product-update'),
     # path('products/delete/<int:pk>/', ProductDeleteView.as_view(), name='product-delete'),
 
+    ####################################### ADMIN API ####################################################
+    path('api/admin/products/', ProductListAdmin.as_view(), name='admin-product-list'),
+
 ]
