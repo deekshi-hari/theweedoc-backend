@@ -25,8 +25,15 @@ class Product(models.Model):
         ('tamil', 'TAMIL'),
         ('hindi', 'HINDI'),
         ]
+    
+    STATUS = [
+        ('approved', 'APPROVED'),
+        ('rejected', 'REJECTED'),
+        ('pending', 'PENDING'),
+        ]
 
     title = models.CharField(max_length=200, unique=True)
+    status = models.CharField(choices=STATUS, max_length=50, default='pending')
     description = models.TextField(blank=True, null=True)
     language = models.CharField(choices=Language_choice, max_length=200, default='malayalam')
     image = models.CharField(max_length=500, blank=True)
