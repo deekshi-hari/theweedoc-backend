@@ -9,6 +9,7 @@ from users.cloudinary_utils import upload_files
 from django.http import QueryDict
 from .pagination import FilterPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from users.permessions import IsAdmin, IsSuperAdmin
 
 
 class ProductListAPIView(generics.ListAPIView):
@@ -107,7 +108,7 @@ class GenereListView(generics.ListAPIView):
 
 class ProductListAdmin(generics.ListAPIView):
     queryset = Product.custom_objects.order_by('-id')
-    permission_classes = (AllowAny,)
+    permission_classes = (IsSuperAdmin, IsAdmin, )
     serializer_class = ProductRetriveSerializer
     pagination_class = FilterPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
