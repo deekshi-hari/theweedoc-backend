@@ -114,3 +114,21 @@ class ProductListAdmin(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['genere']
     search_fields = ['status']
+
+
+class ApproveProductAPI(generics.UpdateAPIView):
+    queryset = Product.custom_objects.order_by('-id')
+    permission_classes = (IsSuperAdmin, IsAdmin, )
+    serializer_class = ProductCreateSerializer
+
+    def put(self, request, *args, **kwargs):
+        product = Product.objects.filter(id=request.data['id'])
+        data = QueryDict('', mutable=True)
+        data.update(request.data)
+        serializer = self.serializer_class(product, partial=True, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            
