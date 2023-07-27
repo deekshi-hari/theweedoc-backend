@@ -5,10 +5,12 @@ from .models import User
 class IsSuperAdmin(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user and request.user.user_type == "superadmin"
+        if request.user.user_type == "superadmin":
+            return request.user
     
 
 class IsAdmin(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user and request.user.user_type == "admin"
+        if request.user.user_type == "admin" or request.user.user_type == "superadmin":
+            return request.user

@@ -109,7 +109,7 @@ class GenereListView(generics.ListAPIView):
 
 class ProductListAdmin(generics.ListAPIView):
     queryset = Product.custom_objects.order_by('-id')
-    permission_classes = (IsSuperAdmin, IsAdmin, )
+    permission_classes = (IsAdmin, )
     serializer_class = ProductRetriveSerializer
     pagination_class = FilterPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -119,7 +119,7 @@ class ProductListAdmin(generics.ListAPIView):
 
 class ApproveProductAPI(generics.UpdateAPIView):
     queryset = Product.custom_objects.order_by('-id')
-    permission_classes = (IsSuperAdmin, IsAdmin, )
+    permission_classes = (IsAdmin, )
     serializer_class = ProductCreateSerializer
 
     def put(self, request, *args, **kwargs):
@@ -131,5 +131,3 @@ class ApproveProductAPI(generics.UpdateAPIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            

@@ -3,7 +3,8 @@ from .serializers import MyTokenObtainPairSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import User
 from .serializers import RegisterSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, \
-                            UserSerializer, UserSearchSerializer, UserUpdateSerializer, UsernameValidateSerializer
+                            UserSerializer, UserSearchSerializer, UserUpdateSerializer, UsernameValidateSerializer, \
+                            AdminUserListSerializer
 from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,6 +22,7 @@ from django.http import QueryDict
 from .cloudinary_utils import upload_files
 from products.pagination import FilterPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 
 
 class MyObtainTokenPairView(generics.CreateAPIView):
@@ -203,9 +205,9 @@ class UserSearchView(generics.ListAPIView):
 
 
 class ListAdminUsers(generics.ListAPIView):
-    queryset = User.objects.order_by('-id')
-    permission_classes = (IsSuperAdmin, IsAdmin, )
-    serializer_class = UserSerializer
+    queryset = User.objects.filter(Q(user_type='admin') | Q(user_type='superadmin')).order_by('-id')
+    permission_classes = (IsAdmin, )
+    serializer_class = AdminUserListSerializer
     pagination_class = FilterPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['designation']
