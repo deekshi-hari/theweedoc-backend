@@ -106,6 +106,7 @@ class GenereListView(generics.ListAPIView):
 
 ##################################################### ADMIN API ###############################################################
 
+
 class ProductListAdmin(generics.ListAPIView):
     queryset = Product.custom_objects.order_by('-id')
     permission_classes = (IsSuperAdmin, IsAdmin, )
