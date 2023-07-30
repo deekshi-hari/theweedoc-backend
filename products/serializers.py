@@ -28,11 +28,19 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
     genere = GenereRetriveSerializer(many=True)
     customer = serializers.SerializerMethodField()
     cast = CastSerializer(many=True)
+    like_count = serializers.SerializerMethodField()
+    dislike_count = serializers.SerializerMethodField()
 
     def get_customer(self, obj):
         if obj.customer.first_name=="" and obj.customer.last_name=="":
             return obj.customer.username
         return obj.customer.first_name + ' ' + obj.customer.last_name
+    
+    def get_like_count(self, obj):
+        return obj.likes.count()
+
+    def get_dislike_count(self, obj):
+        return obj.dislikes.count()
 
     class Meta:
         model = Product
