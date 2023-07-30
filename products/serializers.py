@@ -10,6 +10,13 @@ class GenereRetriveSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
+class CastSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'profile_pic', 'designation', ]
+
+
 class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -20,6 +27,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 class ProductRetriveSerializer(serializers.ModelSerializer):
     genere = GenereRetriveSerializer(many=True)
     customer = serializers.SerializerMethodField()
+    cast = CastSerializer(many=True)
 
     def get_customer(self, obj):
         if obj.customer.first_name=="" and obj.customer.last_name=="":

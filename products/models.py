@@ -11,7 +11,7 @@ class Genere(models.Model):
 class ProductManagerActive(models.Manager):
 
     def get_is_active(self):
-        return self.filter(is_active=True).order_by('-created_at')
+        return self.filter(status="approved").order_by('-created_at')
     
     def get_inactive(self):
         return self.filter(is_active=False).order_by('-created_at')

@@ -169,7 +169,7 @@ class FollowUser(generics.GenericAPIView):
 
 
 class UserUpdateView(generics.UpdateAPIView):
-    permission_classes = (IsAuthenticated, ) #custom permession class
+    permission_classes = (IsAuthenticated, )
     serializer_class = UserUpdateSerializer
     queryset = User.objects.all()
 
