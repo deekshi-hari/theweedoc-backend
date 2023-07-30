@@ -74,35 +74,39 @@ class GenereListView(generics.ListAPIView):
     serializer_class = GenereRetriveSerializer
     permission_classes = (AllowAny,)
 
+
+class LikeProductView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, product_id):
+        try:
+            product = Product.objects.get(pk=product_id)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        product.likes.add(user)
+        product.dislikes.remove(user)
+
+        serializer = ProductRetriveSerializer(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
-# class ProductUpdateView(generics.UpdateAPIView):
-#     permission_classes = (IsAuthenticated,)
-#     serializer_class = ProductSerializer
-#     queryset = Product.objects.all()
+class DislikeProductView(APIView):
+    permission_classes = [IsAuthenticated]
 
-#     def update(self, request, *args, **kwargs):
-#         product = self.get_object()
-#         if product.customer.id != request.user.id:
-#             return Response({'error': 'you dont have permession to update'}, status=status.HTTP_403_FORBIDDEN)
-#         serializer = ProductSerializer(product, partial=True, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+    def post(self, request, product_id):
+        try:
+            product = Product.objects.get(pk=product_id)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
-# class ProductDeleteView(generics.DestroyAPIView):
-#     permission_classes = (IsAuthenticated,)
-#     serializer_class = ProductSerializer
-#     queryset = Product.objects.all()
+        user = request.user
+        product.dislikes.add(user)
+        product.likes.remove(user)
 
-#     def delete(self, request, *args, **kwargs):
-#         product = self.get_object()
-#         if product.customer.id != request.user.id:
-#             return Response({'error': 'you dont have permession to delete'}, status=status.HTTP_403_FORBIDDEN)
-#         return self.destroy(request, *args, **kwargs)
-
+        serializer = ProductRetriveSerializer(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 ##################################################### ADMIN API ###############################################################
 

@@ -44,6 +44,8 @@ class Product(models.Model):
     age = models.CharField(max_length=50, blank=True, null=True)
     is_active = models.BooleanField(default=False)
     cast = models.ManyToManyField(User, related_name='users', blank=True)
+    likes = models.ManyToManyField(User, related_name='liked_products', blank=True)
+    dislikes = models.ManyToManyField(User, related_name='disliked_products', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField('updated_at', auto_now=True, blank=True, null=True)
 
