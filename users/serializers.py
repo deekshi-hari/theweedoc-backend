@@ -4,6 +4,8 @@ from .models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
+from products.models import Product
+from products.serializers import ProductCreateSerializer, GenereRetriveSerializer
 
 
 class MyTokenObtainPairSerializer(serializers.ModelSerializer):
@@ -82,11 +84,54 @@ class UserSearchSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'profile_pic']
 
 
+class UserProductSerializer(serializers.ModelSerializer):
+    genere = GenereRetriveSerializer(many=True)
+    like_count = serializers.SerializerMethodField()
+    dislike_count = serializers.SerializerMethodField()
+    has_liked = serializers.SerializerMethodField()
+    has_disliked = serializers.SerializerMethodField()
+
+    def get_like_count(self, obj):
+        return obj.likes.count()
+
+    def get_dislike_count(self, obj):
+        return obj.dislikes.count()
+    
+    def get_has_liked(self, obj):
+        user = self.context['request'].user
+        return obj.likes.filter(pk=user.pk).exists()
+
+    def get_has_disliked(self, obj):
+        user = self.context['request'].user
+        return obj.dislikes.filter(pk=user.pk).exists()
+
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'genere', 'age', 'language', 'like_count', 'dislike_count', 'has_liked', 'has_disliked']
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
+
+    user_filims = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+
+    def get_user_filims(self, obj):
+        request = self.context['request']
+        filims = Product.objects.filter(customer=obj.id, status='approved')
+        ser = UserProductSerializer(filims, many=True, context={'request':request})
+        return ser.data
+    
+    def get_followers_count(self, obj):
+        return obj.followers.count()
+
+    def get_following_count(self, obj):
+        return obj.following.count()
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number')
+        fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number', 
+                  'user_filims', 'followers_count', 'following_count')
 
 
 class AdminUserListSerializer(serializers.ModelSerializer):

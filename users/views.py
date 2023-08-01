@@ -211,6 +211,12 @@ class UserDetailView(generics.RetrieveAPIView):
     lookup_field = 'id'
     lookup_url_kwarg = 'user_id'
 
+    def get_serializer_context(self):
+        # Get the default context data by calling the parent's method
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
 
 #################################################### ADMIN ####################################################################
 
