@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import MyObtainTokenPairView, RegisterView, PasswordResetView, PasswordResetConfirmView, UserNameValidateView, \
-                    FollowUser, UserUpdateView, UserSearchView, ListAdminUsers
+                    FollowUser, UserUpdateView, UserSearchView, ListAdminUsers, UserDetailView
 
 
 urlpatterns = [
@@ -12,8 +12,8 @@ urlpatterns = [
     path('api/follow/', FollowUser.as_view(), name='password_reset_confirm'),
     path('api/user/update/', UserUpdateView.as_view(), name='user-update'),
     path('api/user/search/', UserSearchView.as_view(), name='user-search'),
-    # path('user/delete/<int:pk>/', UserDeleteView.as_view(), name='token_refresh'),
-    # path('send_sms/', SendSMS.as_view(), name='send_sms'),
+    path('api/user/<int:user_id>/', UserDetailView.as_view(), name='user-detail'),
+    
 
     ###################################### ADMIN #################################################
 

@@ -26,7 +26,7 @@ class ProductListAPIView(generics.ListAPIView):
 class ProductDetailView(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
     queryset = Product.objects.all()
-    serializer_class = ProductRetriveSerializer
+    serializer_class = ProductDetailSerializer
     lookup_field = 'id'
     lookup_url_kwarg = 'product_id'
 
@@ -88,7 +88,7 @@ class LikeProductView(APIView):
         product.likes.add(user)
         product.dislikes.remove(user)
 
-        serializer = ProductRetriveSerializer(product)
+        serializer = ProductRetriveSerializer(product, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
@@ -105,7 +105,7 @@ class DislikeProductView(APIView):
         product.dislikes.add(user)
         product.likes.remove(user)
 
-        serializer = ProductRetriveSerializer(product)
+        serializer = ProductRetriveSerializer(product, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 ##################################################### ADMIN API ###############################################################

@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import User
 from .serializers import RegisterSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, \
                             UserSerializer, UserSearchSerializer, UserUpdateSerializer, UsernameValidateSerializer, \
-                            AdminUserListSerializer
+                            AdminUserListSerializer, UserDetailSerializer
 from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -203,6 +203,16 @@ class UserSearchView(generics.ListAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ['username', 'first_name', 'last_name']
 
+
+class UserDetailView(generics.RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    queryset = User.objects.all()
+    serializer_class = UserDetailSerializer
+    lookup_field = 'id'
+    lookup_url_kwarg = 'user_id'
+
+
+#################################################### ADMIN ####################################################################
 
 class ListAdminUsers(generics.ListAPIView):
     queryset = User.objects.filter(Q(user_type='admin') | Q(user_type='superadmin')).order_by('-id')
