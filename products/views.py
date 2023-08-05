@@ -110,9 +110,30 @@ class DislikeProductView(APIView):
     
 
 class ReviewList(generics.ListAPIView):
-    queryset = Review.objects.all()
-    serializer_class = GenereRetriveSerializer
-    permission_classes = (AllowAny,)  
+    serializer_class = ReviewSerializer
+    permission_classes = (AllowAny,)
+    
+    def get_queryset(self):
+        movie_id = self.kwargs['movie_id']  # Assuming 'movie_id' is passed as a URL parameter
+        queryset = Review.objects.filter(movie_id=movie_id)
+        return queryset
+    
+
+class AddReviewView(generics.CreateAPIView):
+    serializer_class = ReviewAddSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        data = QueryDict('', mutable=True)
+        data.update(request.data)
+        data['user'] = request.user.id
+        data['movie'] = self.kwargs['movie_id']
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 ##################################################### ADMIN API ###############################################################
 

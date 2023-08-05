@@ -13,7 +13,6 @@ urlpatterns = [
     path('api/user/update/', UserUpdateView.as_view(), name='user-update'),
     path('api/user/search/', UserSearchView.as_view(), name='user-search'),
     path('api/user/<int:user_id>/', UserDetailView.as_view(), name='user-detail'),
-    
 
     ###################################### ADMIN #################################################
 

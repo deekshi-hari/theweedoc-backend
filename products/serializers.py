@@ -105,6 +105,14 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    user = CastSerializer()
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+
+class ReviewAddSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review

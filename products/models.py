@@ -48,7 +48,6 @@ class Product(models.Model):
     dislikes = models.ManyToManyField(User, related_name='disliked_products', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField('updated_at', auto_now=True, blank=True, null=True)
-
     objects = models.Manager()  # The default manager
     custom_objects = ProductManagerActive()
 
