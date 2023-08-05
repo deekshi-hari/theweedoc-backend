@@ -12,5 +12,6 @@ class IsSuperAdmin(BasePermission):
 class IsAdmin(BasePermission):
 
     def has_permission(self, request, view):
+        print(request.user.user_type)
         if request.user.user_type == "admin" or request.user.user_type == "superadmin":
             return request.user

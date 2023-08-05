@@ -3,7 +3,7 @@ from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Product, Genere
+from .models import Product, Genere, Review
 from .serializers import *
 from users.cloudinary_utils import upload_files
 from django.http import QueryDict
@@ -107,6 +107,12 @@ class DislikeProductView(APIView):
 
         serializer = ProductRetriveSerializer(product, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class ReviewList(generics.ListAPIView):
+    queryset = Review.objects.all()
+    serializer_class = GenereRetriveSerializer
+    permission_classes = (AllowAny,)  
 
 ##################################################### ADMIN API ###############################################################
 

@@ -234,6 +234,10 @@ class UserDetailView(generics.RetrieveAPIView):
         # Get the default context data by calling the parent's method
         context = super().get_serializer_context()
         context['request'] = self.request
+        if self.request.user.is_authenticated:
+            followers_subquery = self.request.user.followers.all().values_list('id', flat=True)
+            followers_subquery_list = list(followers_subquery)
+            context['followers_subquery_list'] = followers_subquery_list
         return context
 
 

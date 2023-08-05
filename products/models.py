@@ -51,3 +51,12 @@ class Product(models.Model):
 
     objects = models.Manager()  # The default manager
     custom_objects = ProductManagerActive()
+
+
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Product, on_delete=models.CASCADE)
+    review_content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+

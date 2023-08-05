@@ -121,10 +121,19 @@ class UserProductSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-
     user_filims = serializers.SerializerMethodField()
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
+
+    def get_is_following(self, obj):
+        if self.context['request'].user.is_authenticated:
+            print(self.context)
+            followers_subquery = self.context['followers_subquery_list']
+            if obj.id in followers_subquery:
+                return True
+            return False
+        return False
 
     def get_user_filims(self, obj):
         request = self.context['request']
@@ -141,7 +150,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number', 
-                  'user_filims', 'followers_count', 'following_count')
+                  'user_filims', 'followers_count', 'following_count', 'is_following')
 
 
 class AdminUserListSerializer(serializers.ModelSerializer):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Genere
+from .models import Product, Genere, Review
 from users.models import User
 
 
@@ -101,4 +101,11 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
+        fields = '__all__'
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Review
         fields = '__all__'
