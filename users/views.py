@@ -23,6 +23,7 @@ from .cloudinary_utils import upload_files
 from products.pagination import FilterPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
+from django.db import models
 
 
 class MyObtainTokenPairView(generics.CreateAPIView):
@@ -202,6 +203,24 @@ class UserSearchView(generics.ListAPIView):
     pagination_class = FilterPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['username', 'first_name', 'last_name']
+
+    def get_serializer_context(self):
+        # Get the default context data by calling the parent's method
+        context = super().get_serializer_context()
+        if self.request.user.is_authenticated:
+            followers_subquery = self.request.user.followers.all().values_list('id', flat=True)
+            followers_subquery_list = list(followers_subquery)
+            context['followers_subquery_list'] = followers_subquery_list
+        context['request'] = self.request
+        return context
+    
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     # If the user is authenticated, add the 'is_following' field to the queryset
+    #     if self.request.user.is_authenticated:
+    #         queryset = queryset.annotate(is_following=self.request.user.following.filter(pk=models.OuterRef('pk')).exists())
+    #         print(queryset)
+    #     return queryset
 
 
 class UserDetailView(generics.RetrieveAPIView):

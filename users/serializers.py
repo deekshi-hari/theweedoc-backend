@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import User
+from django.db.models import OuterRef, Subquery
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
@@ -78,10 +79,19 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserSearchSerializer(serializers.ModelSerializer):
+    is_following = serializers.SerializerMethodField()
+
+    def get_is_following(self, obj):
+        if self.context['request'].user.is_authenticated:
+            followers_subquery = self.context['followers_subquery_list']
+            if obj.id in followers_subquery:
+                return True
+            return False
+        return False
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_pic']
+        fields = ['id', 'username', 'profile_pic', 'designation', 'is_following']
 
 
 class UserProductSerializer(serializers.ModelSerializer):
