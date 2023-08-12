@@ -14,7 +14,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'designation', 'profile_pic']
+        fields = ['username', 'first_name', 'last_name', 'designation', 'profile_pic']
 
 
 class CastSerializer(serializers.ModelSerializer):
@@ -35,11 +35,17 @@ class CastRetriveSerializer(serializers.ModelSerializer):
 class ProductRetriveSerializer(serializers.ModelSerializer):
     genere = GenereRetriveSerializer(many=True)
     customer = serializers.SerializerMethodField()
-    # cast = CastSerializer(many=True)
     like_count = serializers.SerializerMethodField()
     dislike_count = serializers.SerializerMethodField()
     has_liked = serializers.SerializerMethodField()
     has_disliked = serializers.SerializerMethodField()
+    cast = serializers.SerializerMethodField()
+
+    def get_cast(self, obj):
+        casts = CastMember.objects.filter(product=obj.id)
+        ser = CastRetriveSerializer(casts, many=True)
+        return ser.data
+
 
     def get_customer(self, obj):
         if obj.customer.first_name=="" and obj.customer.last_name=="":
