@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Genere, Review
+from .models import Product, Genere, Review, CastMember
 from users.models import User
 
 
@@ -10,24 +10,32 @@ class GenereRetriveSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
-class CastSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ['username', 'first_name', 'last_name', 'profile_pic', 'designation', ]
-
-
 class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['name']
+        fields = ['first_name', 'last_name', 'designation', 'profile_pic']
+
+
+class CastSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CastMember
+        fields = '__all__'
+
+
+class CastRetriveSerializer(serializers.ModelSerializer):
+    cast_member = CustomerSerializer()
+
+    class Meta:
+        model = CastMember
+        fields = '__all__'
 
 
 class ProductRetriveSerializer(serializers.ModelSerializer):
     genere = GenereRetriveSerializer(many=True)
     customer = serializers.SerializerMethodField()
-    cast = CastSerializer(many=True)
+    # cast = CastSerializer(many=True)
     like_count = serializers.SerializerMethodField()
     dislike_count = serializers.SerializerMethodField()
     has_liked = serializers.SerializerMethodField()
