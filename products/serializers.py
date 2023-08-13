@@ -119,7 +119,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = CastSerializer()
+    user = CustomerSerializer()
 
     class Meta:
         model = Review
