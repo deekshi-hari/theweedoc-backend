@@ -130,7 +130,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     def get_is_following(self, obj):
         if self.context['request'].user.is_authenticated:
-            print(self.context)
             followers_subquery = self.context['followers_subquery_list']
             if obj.id in followers_subquery:
                 return True
@@ -152,7 +151,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number', 
-                  'user_filims', 'followers_count', 'following_count', 'is_following')
+                  'user_filims', 'followers_count', 'following_count', 'is_following', 'profile_pic')
 
 
 class AdminUserListSerializer(serializers.ModelSerializer):
