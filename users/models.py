@@ -36,7 +36,6 @@ class User(AbstractUser):
 
 class UserOTP(models.Model):
     email = models.EmailField(blank=True)
-    phone_number = models.CharField(blank=True, max_length=14)
     otp = models.PositiveBigIntegerField()
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)

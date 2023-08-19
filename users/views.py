@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import User
+from .models import User, UserOTP
 from .serializers import RegisterSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, \
                             UserSerializer, UserSearchSerializer, UserUpdateSerializer, UsernameValidateSerializer, \
                             AdminUserListSerializer, UserDetailSerializer
@@ -24,6 +24,7 @@ from products.pagination import FilterPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 from django.db import models
+import random
 
 
 class MyObtainTokenPairView(generics.CreateAPIView):
@@ -51,43 +52,45 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 
-# class UserUpdateView(generics.UpdateAPIView):
-#     permission_classes = (IsAdmin,) #custom permession class
-#     serializer_class = UserUpdateSerializer
-#     queryset = User.objects.all()
+class UserOTPSendView(APIView):
 
-#     def update(self, request, *args, **kwargs):
-#         if 'username' in request.data:
-#             return Response({'error': 'username cannot be updated'}, status=status.HTTP_403_FORBIDDEN)
-#         try:
-#             user = self.get_object()
-#             serializer = UserUpdateSerializer(user, partial=True, data=request.data)
-#             if serializer.is_valid():
-#                 serializer.save()
-#                 return Response(serializer.data)
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#         except:
-#             return Response({'error': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    def generate_otp(self, email):
+        otp = random.randint(100000, 999999)
+        if UserOTP.objects.filter(otp=otp).exists():
+            return self.generate_otp(email)
+        return otp
+
+    def post(self, request, *args, **kwargs):
+        email = request.data['email']
+        otp = self.generate_otp(email)
+        otp_obj = UserOTP.objects.create(
+            email = email,
+            otp = otp
+        )
+        mail_subject = 'Weedoc OTP Verification'
+        message = render_to_string(
+            'otp_verification_email.html',
+            {
+                'otp': otp
+            }
+        )
+        email = EmailMessage(mail_subject, message, to=[request.data['email']])
+        email.send()
+        return Response({'sucess': 'OTP send sucessfully'})
 
 
-# class UserDeleteView(generics.DestroyAPIView):
-#     permission_classes = (IsAdmin,)
-#     serializer_class = RegisterSerializer
-#     queryset = User.objects.all()
+class UserOTPVerificationView(APIView):
 
-#     def delete(self, request, *args, **kwargs):
-#         try:
-#             user = User.objects.get(pk=self.kwargs['pk'])
-#         except User.DoesNotExist:
-#             return Response({'error': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
-#         return self.destroy(request, *args, **kwargs)
+    def get(self, request, *args, **kwars):
+        otp = int(request.GET.get('otp'))
+        user_otp_obj = UserOTP.objects.filter(otp=otp).order_by('-id')
+        if user_otp_obj.count() > 0:
+            if user_otp_obj[0].otp == otp:
+                return Response({'sucess': 'email verified'})
+            else:
+                return Response({'error': 'wrong otp'})            
+        return Response({'error': 'otp did not generated'})
     
-
-# from .services import send_sms    
-# class GenerateOTP(APIView):
-    
-#     def post(self, request, *args, **kwargs):
-#         return Response({'sucess':'message sucess'})
 
 class PasswordResetView(generics.GenericAPIView):
     serializer_class = PasswordResetSerializer

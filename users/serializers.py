@@ -1,10 +1,12 @@
 from rest_framework import serializers
+import random
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import User
+from .models import User, UserOTP
 from django.db.models import OuterRef, Subquery
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth import authenticate
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 from products.models import Product
 from products.serializers import ProductCreateSerializer, GenereRetriveSerializer
 
