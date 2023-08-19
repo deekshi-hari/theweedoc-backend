@@ -3,7 +3,7 @@ from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Product, Genere, Review
+from .models import Product, Genere, Review, SavedMovies
 from .serializers import *
 from users.cloudinary_utils import upload_files
 from django.http import QueryDict
@@ -26,7 +26,7 @@ class ProductListAPIView(generics.ListAPIView):
 class ProductDetailView(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
     queryset = Product.objects.all()
-    serializer_class = ProductDetailSerializer
+    serializer_class = ProductRetriveSerializer
     lookup_field = 'id'
     lookup_url_kwarg = 'product_id'
 
@@ -151,6 +151,38 @@ class AddReviewView(generics.CreateAPIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SavedVideosView(APIView):
+    serializer_class = SavedMoviesSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        data = QueryDict('', mutable=True)
+        data.update(request.data)
+        data['user'] = request.user.id
+        data['movie'] = self.kwargs['movie']
+        saved_movie = SavedMovies.objects.filter(user=data['user'], movie=data['movie'])
+        if saved_movie.count() > 0:
+            saved_movie.delete()
+            return Response({'sucess': 'movie removed sucessfully'}, status=status.HTTP_200_OK)
+        else:
+            serializer = self.serializer_class(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'sucess': 'movie saved sucessfully'}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+
+class ListSavedMovies(generics.ListAPIView):
+    serializer_class = SavedMovieListsSerializer
+    permission_classes = (IsAuthenticated,)
+    
+    def get_queryset(self):
+        queryset = SavedMovies.objects.filter(user=self.request.user)
+        return queryset
+
 
 
 ##################################################### ADMIN API ###############################################################

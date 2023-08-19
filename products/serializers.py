@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Genere, Review, CastMember
+from .models import Product, Genere, Review, CastMember, SavedMovies
 from users.models import User
 
 
@@ -130,4 +130,19 @@ class ReviewAddSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
+        fields = '__all__'
+
+
+class SavedMoviesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SavedMovies
+        fields = '__all__'
+
+
+class SavedMovieListsSerializer(serializers.ModelSerializer):
+    movie = ProductRetriveSerializer()
+
+    class Meta:
+        model = SavedMovies
         fields = '__all__'
