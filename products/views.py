@@ -184,6 +184,14 @@ class ListSavedMovies(generics.ListAPIView):
         return queryset
 
 
+class ListReviewsGiven(generics.ListAPIView):
+    serializer_class = ListAllReviewsGivenSerializer
+    permission_classes = (IsAuthenticated,)
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Review.objects.filter(user=user)
+
 
 ##################################################### ADMIN API ###############################################################
 

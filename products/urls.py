@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/product/<int:product_id>/dislike/', DislikeProductView.as_view(), name='dislike_product'),
     path('api/reviews/<int:movie_id>/', ReviewList.as_view(), name='review_list'),
     path('api/reviews/add/<int:movie_id>/', AddReviewView.as_view(), name='review_add'),
+    path('api/reviews/given/', ListReviewsGiven.as_view(), name='all_reviews_given'),
     path('api/movies/list/saved/', ListSavedMovies.as_view(), name='movie_save_or_remove'),
     path('api/movies/save/<int:movie>/', SavedVideosView.as_view(), name='movie_save_or_remove'),
 

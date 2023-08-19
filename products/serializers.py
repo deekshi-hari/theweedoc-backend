@@ -132,6 +132,13 @@ class ReviewAddSerializer(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
 
+class ListAllReviewsGivenSerializer(serializers.ModelSerializer):
+    movie = ProductCreateSerializer()
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+
 
 class SavedMoviesSerializer(serializers.ModelSerializer):
 
