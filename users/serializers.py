@@ -119,7 +119,7 @@ class UserProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'genere', 'age', 'language', 'like_count', 'dislike_count', 'has_liked', 'has_disliked']
+        fields = ['id', 'title', 'image', 'genere', 'age', 'language', 'like_count', 'dislike_count', 'has_liked', 'has_disliked']
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
