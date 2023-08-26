@@ -2,9 +2,11 @@ from django.shortcuts import render
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import User, UserOTP
+from products.models import Product
 from .serializers import RegisterSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, \
                             UserSerializer, UserSearchSerializer, UserUpdateSerializer, UsernameValidateSerializer, \
                             AdminUserListSerializer, UserDetailSerializer
+from products.serializers import ProductRetriveSerializer
 from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -267,6 +269,18 @@ class UserProfileView(generics.ListAPIView):
             followers_subquery_list = list(followers_subquery)
             context['followers_subquery_list'] = followers_subquery_list
         return context
+    
+
+class UserProducts(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProductRetriveSerializer
+    pagination_class = FilterPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['status']
+
+    def get_queryset(self):
+        queryset = Product.objects.filter(customer=self.request.user)
+        return queryset
 
 
 #################################################### ADMIN ####################################################################

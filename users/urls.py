@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import MyObtainTokenPairView, RegisterView, PasswordResetView, PasswordResetConfirmView, UserNameValidateView, \
                     FollowUser, UserUpdateView, UserSearchView, ListAdminUsers, UserDetailView, UserOTPVerificationView, \
-                    UserOTPSendView, UserProfileView
+                    UserOTPSendView, UserProfileView, UserProducts
 
 
 urlpatterns = [
@@ -17,6 +17,7 @@ urlpatterns = [
     path('api/user/search/', UserSearchView.as_view(), name='user-search'),
     path('api/user/<int:user_id>/', UserDetailView.as_view(), name='user-detail'),
     path('api/user/profile/', UserProfileView.as_view(), name='user-profile'),
+    path('api/user/products/', UserProducts.as_view(), name='user-products'),
 
     ###################################### ADMIN #################################################
 
