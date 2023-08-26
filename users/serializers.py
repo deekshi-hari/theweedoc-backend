@@ -28,6 +28,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         #'first_name', 'last_name'
 
     def validate(self, attrs):
+        if '.' in attrs['username']:
+            raise serializers.ValidationError({'error': "not supported username"})
         if attrs['email']=='':
             raise serializers.ValidationError({'error': "email or phonenumber required"})
         if attrs['password'] != attrs['password2']:

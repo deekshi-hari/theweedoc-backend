@@ -32,10 +32,16 @@ class MyObtainTokenPairView(generics.CreateAPIView):
     serializer_class = MyTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
-        try:
-            user = User.objects.get(username=request.data['username'])
-        except User.DoesNotExist:
-            return Response({'error': 'username is invalid'}, status=status.HTTP_404_NOT_FOUND)
+        if '.' in request.data['username']:
+            try:
+                user = User.objects.get(email=request.data['username'])
+            except User.DoesNotExist:
+                return Response({'error': 'username is invalid'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            try:
+                user = User.objects.get(username=request.data['username'])
+            except User.DoesNotExist:
+                return Response({'error': 'username is invalid'}, status=status.HTTP_404_NOT_FOUND)
         if check_password(request.data['password'], user.password):
             token, created = Token.objects.get_or_create(user=user)
             if user.is_active == False:
