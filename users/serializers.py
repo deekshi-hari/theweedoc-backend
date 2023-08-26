@@ -155,6 +155,11 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number', 
                   'user_filims', 'followers_count', 'following_count', 'is_following', 'profile_pic')
 
+class UserTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('user_type', )
 
 class AdminUserListSerializer(serializers.ModelSerializer):
 

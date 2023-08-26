@@ -5,7 +5,7 @@ from .models import User, UserOTP
 from products.models import Product
 from .serializers import RegisterSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, \
                             UserSerializer, UserSearchSerializer, UserUpdateSerializer, UsernameValidateSerializer, \
-                            AdminUserListSerializer, UserDetailSerializer
+                            AdminUserListSerializer, UserDetailSerializer,UserTypeSerializer
 from products.serializers import ProductRetriveSerializer
 from rest_framework import generics, status, filters
 from rest_framework.views import APIView
@@ -280,6 +280,15 @@ class UserProducts(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = Product.objects.filter(customer=self.request.user)
+        return queryset
+
+
+class UserTypeView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserTypeSerializer
+
+    def get_queryset(self):
+        queryset = User.objects.filter(id=self.request.user.id)
         return queryset
 
 
