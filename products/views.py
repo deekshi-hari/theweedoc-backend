@@ -187,10 +187,13 @@ class ListSavedMovies(generics.ListAPIView):
 class ListReviewsGiven(generics.ListAPIView):
     serializer_class = ListAllReviewsGivenSerializer
     permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['movie']
+    search_fields = ['movie__title']
     
     def get_queryset(self):
         user = self.request.user
-        return Review.objects.filter(user=user)
+        return Review.objects.filter(user=user).order_by('-id')
 
 
 ##################################################### ADMIN API ###############################################################
