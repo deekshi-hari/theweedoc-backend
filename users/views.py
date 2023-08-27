@@ -188,17 +188,26 @@ class UserUpdateView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         data = QueryDict('', mutable=True)
         data.update(request.data)
-        data['profile_pic'] = ""
-        data['designation'] = request.data['designation']
-        data['first_name'] = request.data['first_name']
-        data['last_name'] = request.data['last_name']
-        serializer = self.serializer_class(data=data)
+        if 'profile_pic' in request.data.keys():
+            data['profile_pic'] = ""
+        if 'designation' in request.data.keys():
+            data['designation'] = request.data['designation']
+        if 'first_name' in request.data.keys():
+            data['first_name'] = request.data['first_name']
+        if 'last_name' in request.data.keys():
+            data['last_name'] = request.data['last_name']
+        serializer = self.serializer_class(data=data, partial=True)
         if serializer.is_valid():
-            profile_pic = request.FILES['profile_pic']
-            image_url = f'weedoc/profilepic/{data["first_name"]+str(request.user.id)}/'
-            resulted_image_url = upload_files(profile_pic, image_url, 'image')
-            data['profile_pic'] = resulted_image_url
             user = User.objects.get(id=request.user.id)
+            if 'profile_pic' in request.data.keys():
+                profile_pic = request.FILES['profile_pic']
+                if 'first_name' in request.data.keys():
+                    image_url = f'weedoc/profilepic/{data["first_name"]+str(request.user.id)}/'
+                else:
+                    image_url = f'weedoc/profilepic/{user.first_name+str(request.user.id)}/'
+                resulted_image_url = upload_files(profile_pic, image_url, 'image')
+                data['profile_pic'] = resulted_image_url
+            
             serializer = self.serializer_class(user, partial=True, data=data)
             if serializer.is_valid():
                 serializer.save()
