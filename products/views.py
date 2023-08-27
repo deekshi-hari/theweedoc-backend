@@ -209,7 +209,7 @@ class ProductListAdmin(generics.ListAPIView):
     queryset = Product.custom_objects.order_by('-id')
     permission_classes = (IsAdmin, )
     serializer_class = ProductRetriveSerializer
-    pagination_class = FilterPagination
+    # pagination_class = FilterPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['genere']
     search_fields = ['status']

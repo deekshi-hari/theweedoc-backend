@@ -19,7 +19,7 @@ class UserAdvertisement(generics.ListAPIView):
     def get_queryset(self):
         queryset = Advertisement.objects.filter(customer=self.request.user)
         return queryset
-
+    
 
 class AdvertisementDetailView(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
@@ -27,9 +27,6 @@ class AdvertisementDetailView(generics.RetrieveAPIView):
     serializer_class = AdvertisementRetriveSerializer
     lookup_field = 'id'
     lookup_url_kwarg = 'adv_id'
-
-
-
 
 
 ######################################################## ADMIN #############################################################
