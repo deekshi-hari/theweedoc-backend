@@ -93,7 +93,7 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
     
     def get_owner(self, obj):
         # ser = CustomerDetailSerializer(obj.customer)
-        return obj.customer
+        return obj.customer.id
 
     class Meta:
         model = Product
