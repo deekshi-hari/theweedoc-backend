@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Product, Genere, Review, CastMember, SavedMovies
+from .models import Product, Genere, Review, CastMember, SavedMovies, Review
 from users.models import User
+
 
 
 class GenereRetriveSerializer(serializers.ModelSerializer):
@@ -66,6 +67,10 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
     has_disliked = serializers.SerializerMethodField()
     cast = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
+    review_count = serializers.SerializerMethodField()
+
+    def get_review_count(self, obj):
+        return Review.objects.filter(movie=obj.id).count()
 
     def get_cast(self, obj):
         casts = CastMember.objects.filter(product=obj.id)
@@ -92,7 +97,6 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
         return obj.dislikes.filter(pk=user.pk).exists()
     
     def get_owner(self, obj):
-        # ser = CustomerDetailSerializer(obj.customer)
         return obj.customer.id
 
     class Meta:
