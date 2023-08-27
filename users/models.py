@@ -18,6 +18,10 @@ class User(AbstractUser):
     profile_pic = models.CharField(max_length=700, blank=True, null=True)
     designation = models.CharField(max_length=50, blank=True, null=True)
     followers = models.ManyToManyField('self', related_name='following', symmetrical=False, blank=True)
+    dob = models.CharField(max_length=10, blank=True, null=True)
+    gender = models.CharField(max_length=10, null=True, blank=True)
+    location = models.CharField(max_length=20, blank=True, null=True)
+    postal_code = models.CharField(max_length=10, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
 

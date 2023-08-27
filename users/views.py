@@ -196,6 +196,14 @@ class UserUpdateView(generics.UpdateAPIView):
             data['first_name'] = request.data['first_name']
         if 'last_name' in request.data.keys():
             data['last_name'] = request.data['last_name']
+        if 'dob' in request.data.keys():
+            data['dob'] = request.data['dob']
+        if 'gender' in request.data.keys():
+            data['gender'] = request.data['gender']
+        if 'location' in request.data.keys():
+            data['location'] = request.data['location']
+        if 'postal_code' in request.data.keys():
+            data['postal_code'] = request.data['postal_code']
         serializer = self.serializer_class(data=data, partial=True)
         if serializer.is_valid():
             user = User.objects.get(id=request.user.id)

@@ -79,7 +79,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'designation', 'profile_pic']
+        fields = ['first_name', 'last_name', 'designation', 'profile_pic', 'dob', 'gender', 'location', 'postal_code']
 
 
 class UserSearchSerializer(serializers.ModelSerializer):
