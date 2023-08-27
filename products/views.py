@@ -103,7 +103,10 @@ class LikeProductView(APIView):
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        product.likes.add(user)
+        if product.likes.filter(id=user.id).exists():
+            product.likes.remove(user)
+        else:
+            product.likes.add(user)
         product.dislikes.remove(user)
 
         serializer = ProductRetriveSerializer(product, context={'request': request})
@@ -120,7 +123,10 @@ class DislikeProductView(APIView):
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user
-        product.dislikes.add(user)
+        if product.dislikes.filter(id=user.id).exists():
+            product.dislikes.remove(user)
+        else:
+            product.dislikes.add(user)
         product.likes.remove(user)
 
         serializer = ProductRetriveSerializer(product, context={'request': request})

@@ -46,7 +46,6 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
         ser = CastRetriveSerializer(casts, many=True)
         return ser.data
 
-
     def get_customer(self, obj):
         if obj.customer.first_name=="" and obj.customer.last_name=="":
             return obj.customer.username

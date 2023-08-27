@@ -294,6 +294,7 @@ class UserTypeView(generics.ListAPIView):
 
 #################################################### ADMIN ####################################################################
 
+
 class ListAdminUsers(generics.ListAPIView):
     queryset = User.objects.filter(Q(user_type='admin') | Q(user_type='superadmin')).order_by('-id')
     permission_classes = (IsAdmin, )
