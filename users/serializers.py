@@ -132,7 +132,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
     is_signup_question_answered = serializers.SerializerMethodField()
 
     def get_is_signup_question_answered(self, obj):
-        print(obj.dob)
         if obj.dob == None or obj.gender == None or obj.location == None or obj.postal_code == None:
             return False
         else:

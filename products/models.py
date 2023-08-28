@@ -33,6 +33,7 @@ class Product(models.Model):
 
     title = models.CharField(max_length=200, unique=True)
     status = models.CharField(choices=STATUS, max_length=50, default='pending')
+    status_reason = models.CharField(max_length=800, blank=True)
     description = models.TextField(blank=True, null=True)
     language = models.CharField(choices=Language_choice, max_length=200, default='malayalam')
     image = models.CharField(max_length=500, blank=True)
