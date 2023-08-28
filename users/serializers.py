@@ -129,6 +129,14 @@ class UserDetailSerializer(serializers.ModelSerializer):
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
     is_following = serializers.SerializerMethodField()
+    is_signup_question_answered = serializers.SerializerMethodField()
+
+    def get_is_signup_question_answered(self, obj):
+        print(obj.dob)
+        if obj.dob == None or obj.gender == None or obj.location == None or obj.postal_code == None:
+            return False
+        else:
+            return True
 
     def get_is_following(self, obj):
         if self.context['request'].user.is_authenticated:
@@ -153,7 +161,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number', 
-                  'user_filims', 'followers_count', 'following_count', 'is_following', 'profile_pic')
+                  'user_filims', 'followers_count', 'following_count', 'is_following', 'profile_pic', 'is_signup_question_answered')
 
 class UserTypeSerializer(serializers.ModelSerializer):
 
