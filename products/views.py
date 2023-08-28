@@ -221,7 +221,10 @@ class ApproveProductAPI(generics.UpdateAPIView):
     serializer_class = ProductCreateSerializer
 
     def put(self, request, *args, **kwargs):
-        product = Product.objects.filter(id=request.data['id'])
+        try:
+            product = Product.objects.get(id=request.data['id'])
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
         data = QueryDict('', mutable=True)
         data.update(request.data)
         serializer = self.serializer_class(product, partial=True, data=data)
