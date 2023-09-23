@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from pathlib import Path
 import cloudinary
 import cloudinary.uploader
