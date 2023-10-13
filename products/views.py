@@ -36,6 +36,10 @@ class ProductCreateView(generics.CreateAPIView):
     serializer_class = ProductCreateSerializer
 
     def post(self, request, *args, **kwargs):
+        if 'genere' not in request.data.keys():
+            return Response({"genere": ["This field is required"]})
+        if request.data['genere'] == "":
+            return Response({"genere": ["Genere is empty"]})
         data = QueryDict('', mutable=True)
         data.update(request.data)
         data['customer'] = request.user.id
