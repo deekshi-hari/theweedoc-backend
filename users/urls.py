@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import MyObtainTokenPairView, RegisterView, PasswordResetView, PasswordResetConfirmView, UserNameValidateView, \
                     FollowUser, UserUpdateView, UserSearchView, ListAdminUsers, UserDetailView, UserOTPVerificationView, \
-                    UserOTPSendView, UserProfileView, UserProducts, UserTypeView
+                    UserOTPSendView, UserProfileView, UserProducts, UserTypeView, UserDelete
 
 
 urlpatterns = [
@@ -14,6 +14,7 @@ urlpatterns = [
     path('api/password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('api/follow/', FollowUser.as_view(), name='password_reset_confirm'),
     path('api/user/update/', UserUpdateView.as_view(), name='user-update'),
+    path('api/user/delete/', UserDelete.as_view(), name='user-delete'),
     path('api/user/search/', UserSearchView.as_view(), name='user-search'),
     path('api/user/<int:user_id>/', UserDetailView.as_view(), name='user-detail'),
     path('api/user/profile/', UserProfileView.as_view(), name='user-profile'),

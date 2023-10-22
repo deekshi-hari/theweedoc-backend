@@ -224,6 +224,20 @@ class UserUpdateView(generics.UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+class UserDelete(generics.DestroyAPIView):
+    permission_classes = (IsAuthenticated, )
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            user = User.objects.get(id=request.user.id)
+            user.delete()
+            return Response({'sucess': 'user has been deleted'})
+        except:
+            return Response({'error': 'user not found'})
+    
+
 class UserSearchView(generics.ListAPIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSearchSerializer
