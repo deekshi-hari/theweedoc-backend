@@ -14,7 +14,7 @@ urlpatterns = [
     path('api/reviews/given/', ListReviewsGiven.as_view(), name='all_reviews_given'),
     path('api/movies/list/saved/', ListSavedMovies.as_view(), name='movie_save_or_remove'),
     path('api/movies/save/<int:movie>/', SavedVideosView.as_view(), name='movie_save_or_remove'),
-
+    
 
     ####################################### ADMIN API ####################################################
 

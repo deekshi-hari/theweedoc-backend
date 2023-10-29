@@ -90,24 +90,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
-        # 'OPTIONS': {'charset': 'utf8mb4'}
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.getenv('DATABASE_NAME'),
+#         'USER': os.getenv('DATABASE_USER'),
+#         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+#         'HOST': os.getenv('DATABASE_HOST'),
+#         'PORT': os.getenv('DATABASE_PORT'),
+#         # 'OPTIONS': {'charset': 'utf8mb4'}
+#     }
+# }
 
 
 # Password validation
@@ -173,16 +173,10 @@ EMAIL_HOST_USER = 'deekshithhari4@gmail.com'
 EMAIL_HOST_PASSWORD = 'tsfrcxjatrmwkngb'
 EMAIL_PORT = 587
 
-# cloudinary.config( 
-#   cloud_name = "dwku5ukpm", 
-#   api_key = "515322649859362", 
-#   api_secret = "-zYgpYW6nSGZjR2AC1kjeoJ6R3o" 
-# )
-
 CLOUDINARY = {
-    'cloud_name': 'dwku5ukpm',
-    'api_key': '515322649859362',
-    'api_secret': '-zYgpYW6nSGZjR2AC1kjeoJ6R3o',
+    'cloud_name': os.getenv('CLOUDE_NAME'),
+    'api_key': os.getenv('API_KEY'),
+    'api_secret': os.getenv('API_SECRETE'),
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
