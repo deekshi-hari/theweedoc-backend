@@ -73,12 +73,15 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
     def get_video_quality(self, obj):
         video_url = obj.video
         splitted_list = video_url.split('/upload')
-        video_quality_dict = {
-            "p280": splitted_list[0] + '/upload/q_50' + splitted_list[1],
-            "p360": splitted_list[0] + '/upload/q_40' + splitted_list[1],
-            "p720": splitted_list[0] + '/upload/q_30' + splitted_list[1]
-        }
-        return video_quality_dict
+        if len(splitted_list) == 0:
+            return obj.video
+        else:
+            video_quality_dict = {
+                "p280": splitted_list[0] + '/upload/q_50' + splitted_list[1],
+                "p360": splitted_list[0] + '/upload/q_40' + splitted_list[1],
+                "p720": splitted_list[0] + '/upload/q_30' + splitted_list[1]
+            }
+            return video_quality_dict
 
     def get_review_count(self, obj):
         return Review.objects.filter(movie=obj.id).count()
