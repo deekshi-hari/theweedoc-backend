@@ -31,11 +31,13 @@ class ProductDetailView(generics.RetrieveAPIView):
     lookup_url_kwarg = 'product_id'
 
 
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 class ProductCreateView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = ProductCreateSerializer
 
     def post(self, request, *args, **kwargs):
+        parser_classes = (MultiPartParser, FormParser, FileUploadParser)
         if 'genere' not in request.data.keys():
             return Response({"genere": ["This field is required"]})
         if request.data['genere'] == "":
@@ -53,8 +55,11 @@ class ProductCreateView(generics.CreateAPIView):
             title = request.data["title"]
             image_url = f'weedoc/videos/{title.replace(" ", "_")}/image'
             video_url = f'weedoc/videos/{title.replace(" ", "_")}/video'
+            video_file = request.FILES['video']
+            # video_chunks = [chunk for chunk in video_file.chunks()]
+            video_chunks = [chunk for chunk in video_file.chunks()]
             resulted_image_url = upload_files(image, image_url, 'image')
-            resulted_video_url = upload_files(video, video_url, 'video')
+            resulted_video_url = upload_files(video_chunks, video_url, 'video')
             data['image'] = resulted_image_url
             data['video'] = resulted_video_url[0]
             data['duration'] = resulted_video_url[1]
@@ -68,7 +73,7 @@ class ProductCreateView(generics.CreateAPIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class AddCastView(generics.CreateAPIView):
     serializer_class = CastSerializer
