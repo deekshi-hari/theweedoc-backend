@@ -10,6 +10,7 @@ from django.http import QueryDict
 from .pagination import FilterPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from users.permessions import IsAdmin, IsSuperAdmin
+from products.notification import add_notidication
 
 
 class ProductListAPIView(generics.ListAPIView):
@@ -209,6 +210,18 @@ class ListReviewsGiven(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Review.objects.filter(user=user).order_by('-id')
+    
+
+class NotificationListView(generics.ListAPIView):
+    serializer_class = NotificationAddSerializer
+    permission_classes = (IsAuthenticated,)
+    # filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    # filterset_fields = ['movie']
+    # search_fields = ['movie__title']
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Notification.objects.filter(recipient=user).order_by('-id')
 
 
 ##################################################### ADMIN API ###############################################################
@@ -239,5 +252,11 @@ class ApproveProductAPI(generics.UpdateAPIView):
         serializer = self.serializer_class(product, partial=True, data=data)
         if serializer.is_valid():
             serializer.save()
+            msg = f"{product.title} has been {request.data['status']}."
+            notification = add_notidication(product.customer, msg)
+            if notification == None:
+                print('*********************Notification not created')
+            else:
+                print('*********************Notification created')
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

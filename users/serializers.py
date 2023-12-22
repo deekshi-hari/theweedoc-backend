@@ -7,7 +7,7 @@ from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
-from products.models import Product
+from products.models import Product, Notification
 from products.serializers import ProductCreateSerializer, GenereRetriveSerializer
 
 
@@ -167,6 +167,13 @@ class UserTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('user_type', )
+
+
+class NotificationAddSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Notification
+        fields = '__all__'
 
 class AdminUserListSerializer(serializers.ModelSerializer):
 

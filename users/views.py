@@ -124,6 +124,7 @@ class PasswordResetView(generics.GenericAPIView):
             }
         )
         email = EmailMessage(mail_subject, message, to=[email])
+        email.content_subtype = 'html'
         email.send()
         return Response(
             {'detail': 'Password reset email has been sent'},
