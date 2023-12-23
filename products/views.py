@@ -58,9 +58,8 @@ class ProductCreateView(generics.CreateAPIView):
             video_url = f'weedoc/videos/{title.replace(" ", "_")}/video'
             video_file = request.FILES['video']
             # video_chunks = [chunk for chunk in video_file.chunks()]
-            video_chunks = [chunk for chunk in video_file.chunks()]
             resulted_image_url = upload_files(image, image_url, 'image')
-            resulted_video_url = upload_files(video_chunks, video_url, 'video')
+            resulted_video_url = upload_files(video_file, video_url, 'video')
             data['image'] = resulted_image_url
             data['video'] = resulted_video_url[0]
             data['duration'] = resulted_video_url[1]

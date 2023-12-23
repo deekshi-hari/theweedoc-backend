@@ -169,12 +169,6 @@ class UserTypeSerializer(serializers.ModelSerializer):
         fields = ('user_type', )
 
 
-class NotificationAddSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Notification
-        fields = '__all__'
-
 class AdminUserListSerializer(serializers.ModelSerializer):
 
     class Meta:

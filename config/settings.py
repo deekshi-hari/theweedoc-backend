@@ -90,24 +90,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
-        # 'OPTIONS': {'charset': 'utf8mb4'}
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.getenv('DATABASE_NAME'),
+#         'USER': os.getenv('DATABASE_USER'),
+#         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+#         'HOST': os.getenv('DATABASE_HOST'),
+#         'PORT': os.getenv('DATABASE_PORT'),
+#         # 'OPTIONS': {'charset': 'utf8mb4'}
+#     }
+# }
 
 
 # Password validation
@@ -161,18 +161,15 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
-#TWILLO CONFIG
-# TWILIO_ACCOUNT_SID = ''
-# TWILIO_AUTH_TOKEN = ''
-# TWILIO_PHONE_NUMBER = '+918129012852'
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST = 'smtp.office365.com'
 EMAIL_HOST_USER = 'deekshithhari4@gmail.com'
 EMAIL_HOST_PASSWORD = 'tsfrcxjatrmwkngb'
-EMAIL_PORT = 587
+# EMAIL_HOST = 'smtp.office365.com'
+# EMAIL_HOST_USER = 'Theweedoc@outlook.com'
+# EMAIL_HOST_PASSWORD = 'Clovercloverclover3'
+# EMAIL_PORT = 587
 
 CLOUDINARY = {
     'cloud_name': os.getenv('CLOUDE_NAME'),
@@ -188,3 +185,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500MB
+
+
+# Celery Config
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
