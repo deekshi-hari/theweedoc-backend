@@ -18,7 +18,7 @@ class ProductListAPIView(generics.ListAPIView):
     queryset = Product.custom_objects.get_is_active()
     permission_classes = (AllowAny,)
     serializer_class = ProductRetriveSerializer
-    pagination_class = FilterPagination
+    # pagination_class = FilterPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['genere']
     search_fields = ['title', 'description']
