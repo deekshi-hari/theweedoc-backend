@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render
 from rest_framework import generics, status, filters
 from rest_framework.views import APIView
@@ -11,6 +12,7 @@ from .pagination import FilterPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from users.permessions import IsAdmin, IsSuperAdmin
 from products.notification import add_notidication
+from config.storage_backends import MediaStorage
 
 
 class ProductListAPIView(generics.ListAPIView):
@@ -20,59 +22,118 @@ class ProductListAPIView(generics.ListAPIView):
     serializer_class = ProductRetriveSerializer
     # pagination_class = FilterPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['genere']
-    search_fields = ['title', 'description']
+    filterset_fields = ["genere"]
+    search_fields = ["title", "description"]
 
 
 class ProductDetailView(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
     queryset = Product.objects.all()
     serializer_class = ProductRetriveSerializer
-    lookup_field = 'id'
-    lookup_url_kwarg = 'product_id'
+    lookup_field = "id"
+    lookup_url_kwarg = "product_id"
 
 
 from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
+
+
 class ProductCreateView(generics.CreateAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     serializer_class = ProductCreateSerializer
 
     def post(self, request, *args, **kwargs):
         parser_classes = (MultiPartParser, FormParser, FileUploadParser)
-        if 'genere' not in request.data.keys():
+        if "genere" not in request.data.keys():
             return Response({"genere": ["This field is required"]})
-        if request.data['genere'] == "":
+        if request.data["genere"] == "":
             return Response({"genere": ["Genere is empty"]})
-        data = QueryDict('', mutable=True)
+        data = QueryDict("", mutable=True)
         data.update(request.data)
-        data['customer'] = request.user.id
-        data['image'] = ""
-        data['video'] = ""
-        data['genere'] = 1
+        data["customer"] = request.user.id
+        data["image"] = ""
+        data["video"] = ""
+        data["genere"] = 1
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
-            image = request.FILES['image']
-            video = request.FILES['video']
+            image = request.FILES["image"]
+            video = request.FILES["video"]
             title = request.data["title"]
             image_url = f'weedoc/videos/{title.replace(" ", "_")}/image'
             video_url = f'weedoc/videos/{title.replace(" ", "_")}/video'
-            video_file = request.FILES['video']
+            video_file = request.FILES["video"]
             # video_chunks = [chunk for chunk in video_file.chunks()]
-            resulted_image_url = upload_files(image, image_url, 'image')
-            resulted_video_url = upload_files(video_file, video_url, 'video')
-            data['image'] = resulted_image_url
-            data['video'] = resulted_video_url[0]
-            data['duration'] = resulted_video_url[1]
+            resulted_image_url = upload_files(image, image_url, "image")
+            resulted_video_url = upload_files(video_file, video_url, "video")
+            data["image"] = resulted_image_url
+            data["video"] = resulted_video_url[0]
+            data["duration"] = resulted_video_url[1]
             serializer = self.serializer_class(data=data)
             if serializer.is_valid():
-                geners = Genere.objects.filter(id__in=list(eval(request.data['genere'])))
-                product =  serializer.save()
+                geners = Genere.objects.filter(
+                    id__in=list(eval(request.data["genere"]))
+                )
+                product = serializer.save()
                 product.genere.set(geners)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductUploadView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProductCreateSerializer
+
+    def post(self, request, *args, **kwargs):
+        parser_classes = (MultiPartParser, FormParser, FileUploadParser)
+        if "genere" not in request.data.keys():
+            return Response({"genere": ["This field is required"]})
+        if request.data["genere"] == "":
+            return Response({"genere": ["Genere is empty"]})
+        data = QueryDict("", mutable=True)
+        data.update(request.data)
+        data["customer"] = request.user.id
+        data["image"] = ""
+        data["video"] = ""
+        data["genere"] = 1
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            image = request.FILES.get("image")
+            video = request.FILES.get("video")
+            title = request.data["title"]
+            image_url = None
+            video_url = None
+            if image:
+                file_directory_within_bucket = f"{title.replace(' ', '_')}/image/"
+                file_path_within_bucket = os.path.join(
+                    file_directory_within_bucket, image.name.replace(" ", "_")
+                )
+                media_storage = MediaStorage()
+                image_url = media_storage.url(file_path_within_bucket).split("?", 1)
+                media_storage.save(file_path_within_bucket, image)
+            if video:
+                file_location_within_bucket = f"{title.replace(' ', '_')}/video/"
+                file_location = os.path.join(
+                    file_location_within_bucket, video.name.replace(" ", "_")
+                )
+                video_storage = MediaStorage()
+                video_url = video_storage.url(file_location).split("?", 1)
+                video_storage.save(file_location, video)
+            data["image"] = image_url[0] if image_url else ""
+            data["video"] = video_url[0] if video_url else ""
+            data["duration"] = None
+            serializer = self.serializer_class(data=data)
+            if serializer.is_valid():
+                geners = Genere.objects.filter(
+                    id__in=list(eval(request.data["genere"]))
+                )
+                product = serializer.save()
+                product.genere.set(geners)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response("serializer.errors", status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddCastView(generics.CreateAPIView):
@@ -82,19 +143,21 @@ class AddCastView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         # if CastMember.objects.filter(cast_member=request.data['user']).exists():
         #     return Response({'error': 'cast exists'}, status=status.HTTP_200_OK)
-        data = QueryDict('', mutable=True)
+        data = QueryDict("", mutable=True)
         data.update(request.data)
-        data['cast_member'] = request.data['user']
-        data['role'] = request.data['role']
-        data['product'] = self.kwargs['movie_id']
+        data["cast_member"] = request.data["user"]
+        data["role"] = request.data["role"]
+        data["product"] = self.kwargs["movie_id"]
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save()
-            casts = CastMember.objects.filter(product=self.kwargs['movie_id']).order_by('-id')
+            casts = CastMember.objects.filter(product=self.kwargs["movie_id"]).order_by(
+                "-id"
+            )
             res = CastRetriveSerializer(casts, many=True)
             return Response(res.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class GenereListView(generics.ListAPIView):
     queryset = Genere.objects.all()
@@ -109,7 +172,9 @@ class LikeProductView(APIView):
         try:
             product = Product.objects.get(pk=product_id)
         except Product.DoesNotExist:
-            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         user = request.user
         if product.likes.filter(id=user.id).exists():
@@ -118,9 +183,9 @@ class LikeProductView(APIView):
             product.likes.add(user)
         product.dislikes.remove(user)
 
-        serializer = ProductRetriveSerializer(product, context={'request': request})
+        serializer = ProductRetriveSerializer(product, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
 
 class DislikeProductView(APIView):
     permission_classes = [IsAuthenticated]
@@ -129,7 +194,9 @@ class DislikeProductView(APIView):
         try:
             product = Product.objects.get(pk=product_id)
         except Product.DoesNotExist:
-            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         user = request.user
         if product.dislikes.filter(id=user.id).exists():
@@ -138,29 +205,31 @@ class DislikeProductView(APIView):
             product.dislikes.add(user)
         product.likes.remove(user)
 
-        serializer = ProductRetriveSerializer(product, context={'request': request})
+        serializer = ProductRetriveSerializer(product, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
 
 class ReviewList(generics.ListAPIView):
     serializer_class = ReviewSerializer
     permission_classes = (AllowAny,)
-    
+
     def get_queryset(self):
-        movie_id = self.kwargs['movie_id']  # Assuming 'movie_id' is passed as a URL parameter
+        movie_id = self.kwargs[
+            "movie_id"
+        ]  # Assuming 'movie_id' is passed as a URL parameter
         queryset = Review.objects.filter(movie_id=movie_id)
         return queryset
-    
+
 
 class AddReviewView(generics.CreateAPIView):
     serializer_class = ReviewAddSerializer
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        data = QueryDict('', mutable=True)
+        data = QueryDict("", mutable=True)
         data.update(request.data)
-        data['user'] = request.user.id
-        data['movie'] = self.kwargs['movie_id']
+        data["user"] = request.user.id
+        data["movie"] = self.kwargs["movie_id"]
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -173,27 +242,31 @@ class SavedVideosView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        data = QueryDict('', mutable=True)
+        data = QueryDict("", mutable=True)
         data.update(request.data)
-        data['user'] = request.user.id
-        data['movie'] = self.kwargs['movie']
-        saved_movie = SavedMovies.objects.filter(user=data['user'], movie=data['movie'])
+        data["user"] = request.user.id
+        data["movie"] = self.kwargs["movie"]
+        saved_movie = SavedMovies.objects.filter(user=data["user"], movie=data["movie"])
         if saved_movie.count() > 0:
             saved_movie.delete()
-            return Response({'sucess': 'movie removed sucessfully'}, status=status.HTTP_200_OK)
+            return Response(
+                {"sucess": "movie removed sucessfully"}, status=status.HTTP_200_OK
+            )
         else:
             serializer = self.serializer_class(data=data)
             if serializer.is_valid():
                 serializer.save()
-                return Response({'sucess': 'movie saved sucessfully'}, status=status.HTTP_200_OK)
+                return Response(
+                    {"sucess": "movie saved sucessfully"}, status=status.HTTP_200_OK
+                )
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
+
 
 class ListSavedMovies(generics.ListAPIView):
     serializer_class = SavedMovieListsSerializer
     permission_classes = (IsAuthenticated,)
-    
+
     def get_queryset(self):
         queryset = SavedMovies.objects.filter(user=self.request.user)
         return queryset
@@ -203,13 +276,13 @@ class ListReviewsGiven(generics.ListAPIView):
     serializer_class = ListAllReviewsGivenSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['movie']
-    search_fields = ['movie__title']
-    
+    filterset_fields = ["movie"]
+    search_fields = ["movie__title"]
+
     def get_queryset(self):
         user = self.request.user
-        return Review.objects.filter(user=user).order_by('-id')
-    
+        return Review.objects.filter(user=user).order_by("-id")
+
 
 class NotificationListView(generics.ListAPIView):
     serializer_class = NotificationAddSerializer
@@ -217,36 +290,38 @@ class NotificationListView(generics.ListAPIView):
     # filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     # filterset_fields = ['movie']
     # search_fields = ['movie__title']
-    
+
     def get_queryset(self):
         user = self.request.user
-        return Notification.objects.filter(recipient=user).order_by('-id')
+        return Notification.objects.filter(recipient=user).order_by("-id")
 
 
 ##################################################### ADMIN API ###############################################################
 
 
 class ProductListAdmin(generics.ListAPIView):
-    queryset = Product.custom_objects.order_by('-id')
-    permission_classes = (IsAdmin, )
+    queryset = Product.custom_objects.order_by("-id")
+    permission_classes = (IsAdmin,)
     serializer_class = ProductRetriveSerializer
     # pagination_class = FilterPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['genere']
-    search_fields = ['status']
+    filterset_fields = ["genere"]
+    search_fields = ["status"]
 
 
 class ApproveProductAPI(generics.UpdateAPIView):
-    queryset = Product.custom_objects.order_by('-id')
-    permission_classes = (IsAdmin, )
+    queryset = Product.custom_objects.order_by("-id")
+    permission_classes = (IsAdmin,)
     serializer_class = ProductCreateSerializer
 
     def put(self, request, *args, **kwargs):
         try:
-            product = Product.objects.get(id=request.data['id'])
+            product = Product.objects.get(id=request.data["id"])
         except Product.DoesNotExist:
-            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
-        data = QueryDict('', mutable=True)
+            return Response(
+                {"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        data = QueryDict("", mutable=True)
         data.update(request.data)
         serializer = self.serializer_class(product, partial=True, data=data)
         if serializer.is_valid():
@@ -254,8 +329,8 @@ class ApproveProductAPI(generics.UpdateAPIView):
             msg = f"{product.title} has been {request.data['status']}."
             notification = add_notidication(product.customer, msg)
             if notification == None:
-                print('*********************Notification not created')
+                print("*********************Notification not created")
             else:
-                print('*********************Notification created')
+                print("*********************Notification created")
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

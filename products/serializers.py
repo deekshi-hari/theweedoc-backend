@@ -1,14 +1,21 @@
 from rest_framework import serializers
-from .models import Product, Genere, Review, CastMember, SavedMovies, Review, Notification
+from .models import (
+    Product,
+    Genere,
+    Review,
+    CastMember,
+    SavedMovies,
+    Review,
+    Notification,
+)
 from users.models import User
-
 
 
 class GenereRetriveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genere
-        fields = ['id', 'name']
+        fields = ["id", "name"]
 
 
 # class CustomerDetailSerializer(serializers.ModelSerializer):
@@ -32,7 +39,7 @@ class GenereRetriveSerializer(serializers.ModelSerializer):
 
 #     class Meta:
 #         model = User
-#         fields = ['username', 'first_name', 'last_name', 'designation', 'profile_pic', 
+#         fields = ['username', 'first_name', 'last_name', 'designation', 'profile_pic',
 #                   'followers_count', 'following_count', 'is_following']
 
 
@@ -40,14 +47,14 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'designation', 'profile_pic']
+        fields = ["username", "first_name", "last_name", "designation", "profile_pic"]
 
 
 class CastSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CastMember
-        fields = '__all__'
+        fields = "__all__"
 
 
 class CastRetriveSerializer(serializers.ModelSerializer):
@@ -55,7 +62,7 @@ class CastRetriveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CastMember
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ProductRetriveSerializer(serializers.ModelSerializer):
@@ -72,14 +79,14 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
 
     def get_video_quality(self, obj):
         video_url = obj.video
-        splitted_list = video_url.split('/upload')
+        splitted_list = video_url.split("/upload")
         if len(splitted_list) == 0:
             return obj.video
         else:
             video_quality_dict = {
-                "p280": splitted_list[0] + '/upload/q_50' + splitted_list[1],
-                "p360": splitted_list[0] + '/upload/q_40' + splitted_list[1],
-                "p720": splitted_list[0] + '/upload/q_30' + splitted_list[1]
+                "p280": splitted_list[0] + "/upload/q_50" + splitted_list[1],
+                "p360": splitted_list[0] + "/upload/q_40" + splitted_list[1],
+                "p720": splitted_list[0] + "/upload/q_30" + splitted_list[1],
             }
             return video_quality_dict
 
@@ -92,37 +99,37 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
         return ser.data
 
     def get_customer(self, obj):
-        if obj.customer.first_name=="" and obj.customer.last_name=="":
+        if obj.customer.first_name == "" and obj.customer.last_name == "":
             return obj.customer.username
-        return obj.customer.first_name + ' ' + obj.customer.last_name
-    
+        return obj.customer.first_name + " " + obj.customer.last_name
+
     def get_like_count(self, obj):
         return obj.likes.count()
 
     def get_dislike_count(self, obj):
         return obj.dislikes.count()
-    
+
     def get_has_liked(self, obj):
-        user = self.context['request'].user
+        user = self.context["request"].user
         return obj.likes.filter(pk=user.pk).exists()
 
     def get_has_disliked(self, obj):
-        user = self.context['request'].user
+        user = self.context["request"].user
         return obj.dislikes.filter(pk=user.pk).exists()
-    
+
     def get_owner(self, obj):
         return obj.customer.id
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -136,33 +143,33 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     is_own_product = serializers.SerializerMethodField()
 
     def get_customer(self, obj):
-        if obj.customer.first_name=="" and obj.customer.last_name=="":
+        if obj.customer.first_name == "" and obj.customer.last_name == "":
             return obj.customer.username
-        return obj.customer.first_name + ' ' + obj.customer.last_name
-    
+        return obj.customer.first_name + " " + obj.customer.last_name
+
     def get_like_count(self, obj):
         return obj.likes.count()
 
     def get_dislike_count(self, obj):
         return obj.dislikes.count()
-    
+
     def get_has_liked(self, obj):
-        user = self.context['request'].user
+        user = self.context["request"].user
         return obj.likes.filter(pk=user.pk).exists()
 
     def get_has_disliked(self, obj):
-        user = self.context['request'].user
+        user = self.context["request"].user
         return obj.dislikes.filter(pk=user.pk).exists()
-    
+
     def get_is_own_product(self, obj):
-        user = self.context['request'].user
+        user = self.context["request"].user
         if obj.customer == user:
             return True
         return False
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -170,28 +177,29 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ReviewAddSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = "__all__"
+
 
 class ListAllReviewsGivenSerializer(serializers.ModelSerializer):
     movie = ProductCreateSerializer()
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SavedMoviesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SavedMovies
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SavedMovieListsSerializer(serializers.ModelSerializer):
@@ -199,11 +207,11 @@ class SavedMovieListsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SavedMovies
-        fields = '__all__'
+        fields = "__all__"
 
 
 class NotificationAddSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = '__all__'
+        fields = "__all__"
