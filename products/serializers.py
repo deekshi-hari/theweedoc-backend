@@ -83,11 +83,14 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
         if len(splitted_list) == 0:
             return obj.video
         else:
-            video_quality_dict = {
-                "p280": splitted_list[0] + "/upload/q_50" + splitted_list[1],
-                "p360": splitted_list[0] + "/upload/q_40" + splitted_list[1],
-                "p720": splitted_list[0] + "/upload/q_30" + splitted_list[1],
-            }
+            try:
+                video_quality_dict = {
+                    "p280": splitted_list[0] + "/upload/q_50" + splitted_list[1],
+                    "p360": splitted_list[0] + "/upload/q_40" + splitted_list[1],
+                    "p720": splitted_list[0] + "/upload/q_30" + splitted_list[1],
+                }
+            except:
+                video_quality_dict = {"p720": video_url}
             return video_quality_dict
 
     def get_review_count(self, obj):
