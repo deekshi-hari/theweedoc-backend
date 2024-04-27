@@ -90,6 +90,7 @@ class UserOTPSendView(APIView):
         mail_subject = "Weedoc OTP Verification"
         message = render_to_string("otp_verification_email.html", {"otp": otp})
         email = EmailMessage(mail_subject, message, to=[request.data["email"]])
+        email.content_subtype = "html"
         email.send()
         return Response({"sucess": "OTP send sucessfully"})
 
