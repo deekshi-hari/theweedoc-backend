@@ -334,3 +334,25 @@ class ApproveProductAPI(generics.UpdateAPIView):
                 print("*********************Notification created")
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListLanguages(generics.ListAPIView):
+    queryset = Languages.objects.order_by("name")
+    serializer_class = LanguagesSerializer
+    permission_classes = (AllowAny,)
+
+
+# TODO: Create it
+class AdminLanguages(APIView):
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+
+        ser = LanguagesSerializer(data)
+        if ser.is_valid():
+            ser.save()
+            return Response({"success": "New Language Created"})
+        else:
+            return Response(
+                {"error": str(ser.errors)}, status=status.HTTP_400_BAD_REQUEST
+            )

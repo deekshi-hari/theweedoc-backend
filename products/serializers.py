@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import (
+    Languages,
     Product,
     Genere,
     Review,
@@ -76,6 +77,10 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     review_count = serializers.SerializerMethodField()
     video_quality = serializers.SerializerMethodField()
+    language = serializers.SerializerMethodField()
+
+    def get_language(self, obj):
+        return obj.languages.name
 
     def get_video_quality(self, obj):
         video_url = obj.video
@@ -217,4 +222,10 @@ class NotificationAddSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
+        fields = "__all__"
+
+
+class LanguagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Languages
         fields = "__all__"

@@ -35,6 +35,7 @@ urlpatterns = [
         SavedVideosView.as_view(),
         name="movie_save_or_remove",
     ),
+    path("api/all/languages/list/", ListLanguages.as_view(), name="languages-list"),
     path(
         "api/notifications/", NotificationListView.as_view(), name="notification_list"
     ),
