@@ -25,12 +25,6 @@ class Languages(models.Model):
 
 
 class Product(models.Model):
-    Language_choice = [
-        ("malayalam", "MALAYALAM"),
-        ("english", "ENGLISH"),
-        ("tamil", "TAMIL"),
-        ("hindi", "HINDI"),
-    ]
 
     STATUS = [
         ("approved", "APPROVED"),
@@ -94,3 +88,8 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.recipient.username} - {self.content}"
+
+
+class PrefferedLanguages(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    language = models.ForeignKey(Languages, on_delete=models.CASCADE)
