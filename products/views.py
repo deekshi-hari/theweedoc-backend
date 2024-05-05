@@ -4,7 +4,7 @@ from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Product, Genere, Review, SavedMovies
+from .models import PrefferedLanguages, Product, Genere, Review, SavedMovies
 from .serializers import *
 from users.cloudinary_utils import upload_files
 from django.http import QueryDict
@@ -342,13 +342,13 @@ class ListLanguages(generics.ListAPIView):
     permission_classes = (AllowAny,)
 
 
-# TODO: Create it
 class AdminLanguages(APIView):
+    permission_classes = (IsAdmin,)
 
     def post(self, request, *args, **kwargs):
         data = request.data
 
-        ser = LanguagesSerializer(data)
+        ser = LanguagesSerializer(data=data)
         if ser.is_valid():
             ser.save()
             return Response({"success": "New Language Created"})
@@ -356,3 +356,34 @@ class AdminLanguages(APIView):
             return Response(
                 {"error": str(ser.errors)}, status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class UsersPrefferedLanguages(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        data = []
+        check = PrefferedLanguages.objects.filter(user=request.user)
+        if check.count() >= 3:
+            return Response(
+                {"error": "User Already Selected the Languages"},
+                status=status.HTTP_302_FOUND,
+            )
+        languages = eval(str(request.data["languages"]))
+        for each in languages:
+            lang = PrefferedLanguages()
+            lang.user = request.user
+            lang.language_id = each
+            data.append(lang)
+
+        if len(data) <= 3:
+            res = PrefferedLanguages.objects.bulk_create(data)
+        else:
+            return Response(
+                {"error": "Select Upto three languages"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(
+            {"success": "Preffered Languages Updated Successfully"},
+            status=status.HTTP_202_ACCEPTED,
+        )

@@ -39,7 +39,13 @@ urlpatterns = [
     path(
         "api/notifications/", NotificationListView.as_view(), name="notification_list"
     ),
+    path(
+        "api/select/preffered/languages/",
+        UsersPrefferedLanguages.as_view(),
+        name="preffered-languages",
+    ),
     ####################################### ADMIN API ####################################################
     path("api/admin/products/", ProductListAdmin.as_view(), name="admin-product-list"),
     path("api/admin/product/status/", ApproveProductAPI.as_view(), name="admin-pt"),
+    path("api/add/new/language/", AdminLanguages.as_view(), name="add-new-languages"),
 ]
