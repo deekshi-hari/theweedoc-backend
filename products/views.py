@@ -8,7 +8,7 @@ from .models import PrefferedLanguages, Product, Genere, Review, SavedMovies
 from .serializers import *
 from users.cloudinary_utils import upload_files
 from django.http import QueryDict
-from .pagination import FilterPagination
+from .pagination import FilterPagination, ProductsPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from users.permessions import IsAdmin, IsSuperAdmin
 from products.notification import add_notidication
@@ -16,14 +16,33 @@ from config.storage_backends import MediaStorage
 
 
 class ProductListAPIView(generics.ListAPIView):
-    # queryset = Product.objects.filter(is_active=True).order_by('-created_at')
-    queryset = Product.custom_objects.get_is_active()
     permission_classes = (AllowAny,)
+    pagination_class = ProductsPagination
     serializer_class = ProductRetriveSerializer
-    # pagination_class = FilterPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["genere"]
     search_fields = ["title", "description"]
+
+    def get_queryset(self):
+        try:
+            user = self.request.user
+            lang = list(
+                PrefferedLanguages.objects.filter(user=user).values_list(
+                    "language_id", flat=True
+                )
+            )
+            prod = Product.objects.filter(
+                languages__in=lang, status="approved"
+            ).order_by("-created_at")
+            rem = (
+                Product.objects.filter(status="approved")
+                .exclude(languages__in=lang)
+                .order_by("-created_at")
+            )
+            combined = prod.union(rem)
+            return combined
+        except:
+            return Product.custom_objects.get_is_active()
 
 
 class ProductDetailView(generics.RetrieveAPIView):
