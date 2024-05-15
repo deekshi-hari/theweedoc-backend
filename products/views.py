@@ -12,7 +12,7 @@ from .pagination import FilterPagination, ProductsPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from users.permessions import IsAdmin, IsSuperAdmin
 from products.notification import add_notidication
-from config.storage_backends import MediaStorage
+from config.storage_backends import MediaDelete, MediaStorage
 
 
 class ProductListAPIView(generics.ListAPIView):
@@ -39,8 +39,11 @@ class ProductListAPIView(generics.ListAPIView):
                 .exclude(languages__in=lang)
                 .order_by("-created_at")
             )
-            combined = prod.union(rem)
-            return combined
+            if not self.request.GET.get("search", None):
+                combined = prod.union(rem)
+                return combined
+            else:
+                return Product.custom_objects.get_is_active()
         except:
             return Product.custom_objects.get_is_active()
 
@@ -406,3 +409,30 @@ class UsersPrefferedLanguages(APIView):
             {"success": "Preffered Languages Updated Successfully"},
             status=status.HTTP_202_ACCEPTED,
         )
+
+
+class DeleteProductData(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            product = Product.objects.get(id=request.data["id"])
+        except:
+            return Response(
+                {"error": "Product DoesNotExist"}, status=status.HTTP_404_NOT_FOUND
+            )
+        if product.video:
+            MediaDelete().s3_delete(product.video)
+        if product.image:
+            MediaDelete().s3_delete(product.image)
+        product.delete()
+        return Response(
+            {"success": "Product Deleted Successfully"}, status=status.HTTP_200_OK
+        )
+
+
+class MostLikedProduct(APIView):
+
+    def get(self, request, *args, **kwargs):
+        product = Product.custom_objects.get_is_active().order_by("-likes")[:15]
+        return Response(product, status=status.HTTP_200_OK)
