@@ -416,7 +416,7 @@ class DeleteProductData(APIView):
 
     def delete(self, request, *args, **kwargs):
         try:
-            product = Product.objects.get(id=request.data["id"])
+            product = Product.objects.get(id=kwargs["id"])
         except:
             return Response(
                 {"error": "Product DoesNotExist"}, status=status.HTTP_404_NOT_FOUND
@@ -435,4 +435,4 @@ class MostLikedProduct(APIView):
 
     def get(self, request, *args, **kwargs):
         product = Product.custom_objects.get_is_active().order_by("-likes")[:15]
-        return Response(product, status=status.HTTP_200_OK)
+        return Response(product.values("title", "likes"), status=status.HTTP_200_OK)
