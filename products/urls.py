@@ -48,4 +48,10 @@ urlpatterns = [
     path("api/admin/products/", ProductListAdmin.as_view(), name="admin-product-list"),
     path("api/admin/product/status/", ApproveProductAPI.as_view(), name="admin-pt"),
     path("api/add/new/language/", AdminLanguages.as_view(), name="add-new-languages"),
+    path(
+        "api/admin/delete/products/<int:id>/",
+        DeleteProductData.as_view(),
+        name="admin-delete-product",
+    ),
+    path("api/admin/list/most/liked/", MostLikedProduct.as_view()),
 ]
