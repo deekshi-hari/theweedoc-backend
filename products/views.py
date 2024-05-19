@@ -414,9 +414,9 @@ class UsersPrefferedLanguages(APIView):
 class DeleteProductData(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
-            product = Product.objects.get(id=kwargs["id"])
+            product = Product.objects.get(id=request.data["id"])
         except:
             return Response(
                 {"error": "Product DoesNotExist"}, status=status.HTTP_404_NOT_FOUND

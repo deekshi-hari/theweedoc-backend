@@ -170,8 +170,6 @@ EMAIL_PORT = 587
 
 EMAIL_HOST_USER = "hi@theweedoc.com"
 EMAIL_HOST_PASSWORD = "tzcozhioilxnplyo"
-# EMAIL_HOST_USER = "theweedoc@gmail.com"
-# EMAIL_HOST_PASSWORD = "fehdtmpghxqeqqxu"
 
 
 # EMAIL_HOST = 'smtp.office365.com'
