@@ -211,6 +211,8 @@ class UserUpdateView(generics.UpdateAPIView):
             data["location"] = request.data["location"]
         if "postal_code" in request.data.keys():
             data["postal_code"] = request.data["postal_code"]
+        if "weblink" in request.data.keys():
+            data["weblink"] = request.data["weblink"]
         serializer = self.serializer_class(data=data, partial=True)
         if serializer.is_valid():
             user = User.objects.get(id=request.user.id)
