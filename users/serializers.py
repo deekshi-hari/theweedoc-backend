@@ -14,39 +14,50 @@ from products.serializers import ProductCreateSerializer, GenereRetriveSerialize
 class MyTokenObtainPairSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = "__all__"
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())]) #need to validate email
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )  # need to validate email
+    password = serializers.CharField(
+        write_only=True, required=True, validators=[validate_password]
+    )
     password2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'phone_number', 'password', 'password2')
+        fields = ("username", "email", "phone_number", "password", "password2")
         #'first_name', 'last_name'
 
     def validate(self, attrs):
-        if '.' in attrs['username']:
-            raise serializers.ValidationError({'error': "not supported username"})
-        if attrs['email']=='':
-            raise serializers.ValidationError({'error': "email or phonenumber required"})
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"error": "Password fields didn't match."})
-        if attrs['phone_number'] != "" and User.objects.filter(phone_number=attrs['phone_number']).exists():
-             raise serializers.ValidationError({"error": "Phone number exists"})
+        if "." in attrs["username"]:
+            raise serializers.ValidationError({"error": "not supported username"})
+        if attrs["email"] == "":
+            raise serializers.ValidationError(
+                {"error": "email or phonenumber required"}
+            )
+        if attrs["password"] != attrs["password2"]:
+            raise serializers.ValidationError(
+                {"error": "Password fields didn't match."}
+            )
+        if (
+            attrs["phone_number"] != ""
+            and User.objects.filter(phone_number=attrs["phone_number"]).exists()
+        ):
+            raise serializers.ValidationError({"error": "Phone number exists"})
         return attrs
 
     def create(self, validated_data):
         user = User.objects.create(
-            username=validated_data['username'],
+            username=validated_data["username"],
             # first_name=validated_data['first_name'],
             # last_name=validated_data['last_name'],
-            email=validated_data['email'],
-            phone_number=validated_data['phone_number'],
+            email=validated_data["email"],
+            phone_number=validated_data["phone_number"],
         )
-        user.set_password(validated_data['password'])
+        user.set_password(validated_data["password"])
         user.is_active = False
         user.save()
         return user
@@ -56,7 +67,16 @@ class UsernameValidateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number')
+        fields = (
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "is_staff",
+            "is_active",
+            "date_joined",
+            "phone_number",
+        )
 
 
 class PasswordResetSerializer(serializers.Serializer):
@@ -72,22 +92,32 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = "__all__"
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'designation', 'profile_pic', 'dob', 'gender', 'location', 'postal_code']
+        fields = [
+            "first_name",
+            "last_name",
+            "designation",
+            "profile_pic",
+            "dob",
+            "gender",
+            "location",
+            "postal_code",
+            "weblink",
+        ]
 
 
 class UserSearchSerializer(serializers.ModelSerializer):
     is_following = serializers.SerializerMethodField()
 
     def get_is_following(self, obj):
-        if self.context['request'].user.is_authenticated:
-            followers_subquery = self.context['followers_subquery_list']
+        if self.context["request"].user.is_authenticated:
+            followers_subquery = self.context["followers_subquery_list"]
             if obj.id in followers_subquery:
                 return True
             return False
@@ -95,7 +125,7 @@ class UserSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'profile_pic', 'designation', 'is_following']
+        fields = ["id", "username", "profile_pic", "designation", "is_following"]
 
 
 class UserProductSerializer(serializers.ModelSerializer):
@@ -110,18 +140,29 @@ class UserProductSerializer(serializers.ModelSerializer):
 
     def get_dislike_count(self, obj):
         return obj.dislikes.count()
-    
+
     def get_has_liked(self, obj):
-        user = self.context['request'].user
+        user = self.context["request"].user
         return obj.likes.filter(pk=user.pk).exists()
 
     def get_has_disliked(self, obj):
-        user = self.context['request'].user
+        user = self.context["request"].user
         return obj.dislikes.filter(pk=user.pk).exists()
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'image', 'genere', 'age', 'language', 'like_count', 'dislike_count', 'has_liked', 'has_disliked']
+        fields = [
+            "id",
+            "title",
+            "image",
+            "genere",
+            "age",
+            "language",
+            "like_count",
+            "dislike_count",
+            "has_liked",
+            "has_disliked",
+        ]
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -132,25 +173,30 @@ class UserDetailSerializer(serializers.ModelSerializer):
     is_signup_question_answered = serializers.SerializerMethodField()
 
     def get_is_signup_question_answered(self, obj):
-        if obj.dob == None or obj.gender == None or obj.location == None or obj.postal_code == None:
+        if (
+            obj.dob == None
+            or obj.gender == None
+            or obj.location == None
+            or obj.postal_code == None
+        ):
             return False
         else:
             return True
 
     def get_is_following(self, obj):
-        if self.context['request'].user.is_authenticated:
-            followers_subquery = self.context['followers_subquery_list']
+        if self.context["request"].user.is_authenticated:
+            followers_subquery = self.context["followers_subquery_list"]
             if obj.id in followers_subquery:
                 return True
             return False
         return False
 
     def get_user_filims(self, obj):
-        request = self.context['request']
-        filims = Product.objects.filter(customer=obj.id, status='approved')
-        ser = UserProductSerializer(filims, many=True, context={'request':request})
+        request = self.context["request"]
+        filims = Product.objects.filter(customer=obj.id, status="approved")
+        ser = UserProductSerializer(filims, many=True, context={"request": request})
         return ser.data
-    
+
     def get_followers_count(self, obj):
         return obj.followers.count()
 
@@ -159,18 +205,44 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number', 'designation', 
-                  'user_filims', 'followers_count', 'following_count', 'is_following', 'profile_pic', 'is_signup_question_answered')
+        fields = (
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "is_staff",
+            "is_active",
+            "date_joined",
+            "phone_number",
+            "designation",
+            "user_filims",
+            "followers_count",
+            "following_count",
+            "is_following",
+            "profile_pic",
+            "is_signup_question_answered",
+        )
+
 
 class UserTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('user_type', )
+        fields = ("user_type",)
 
 
 class AdminUserListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'date_joined', 'phone_number', 'user_type')
+        fields = (
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "is_staff",
+            "is_active",
+            "date_joined",
+            "phone_number",
+            "user_type",
+        )
