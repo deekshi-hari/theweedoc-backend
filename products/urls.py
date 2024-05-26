@@ -44,6 +44,11 @@ urlpatterns = [
         UsersPrefferedLanguages.as_view(),
         name="preffered-languages",
     ),
+    path(
+        "api/update/notification/status/",
+        NotificationStatusUpdate.as_view(),
+        name="undate-notifications",
+    ),
     ####################################### ADMIN API ####################################################
     path("api/admin/products/", ProductListAdmin.as_view(), name="admin-product-list"),
     path("api/admin/product/status/", ApproveProductAPI.as_view(), name="admin-pt"),
