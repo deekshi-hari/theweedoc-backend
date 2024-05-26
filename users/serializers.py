@@ -221,6 +221,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "is_following",
             "profile_pic",
             "is_signup_question_answered",
+            "weblink",
         )
 
 
