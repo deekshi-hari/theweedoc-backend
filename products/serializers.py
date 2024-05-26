@@ -48,7 +48,14 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "designation", "profile_pic"]
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "designation",
+            "profile_pic",
+            "weblink",
+        ]
 
 
 class CastSerializer(serializers.ModelSerializer):

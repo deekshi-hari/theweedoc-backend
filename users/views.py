@@ -33,7 +33,7 @@ from django.http import QueryDict
 from .cloudinary_utils import upload_files
 from products.pagination import FilterPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.db import models
 import random
 
@@ -355,3 +355,46 @@ class ListAdminUsers(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["designation"]
     search_fields = ["phone_number", "email", "username"]
+
+
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from django.db.models.functions import TruncMonth, TruncDay, TruncHour
+
+
+class ListUserRegistrations(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_trunc_and_delta(self, filter):
+        filter = filter.lower()
+        if filter == "yearly":
+            return TruncMonth, relativedelta(years=1), "%Y-%m"
+        elif filter == "monthly":
+            return TruncDay, relativedelta(months=1), "%Y-%m-%d"
+        elif filter == "daily":
+            return TruncHour, relativedelta(days=1), " %H:%M"
+        else:
+            raise ValueError(
+                "Invalid filter value. Use 'yearly', 'monthly', or 'daily'."
+            )
+
+    def get(self, request, *args, **kwargs):
+        filter = request.GET.get("filter", "yearly")
+        try:
+            trunc_func, delta, date_format = self.get_trunc_and_delta(filter)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=400)
+
+        start_date = datetime.now() - delta
+        end_date = datetime.now()
+
+        users = (
+            User.objects.filter(created_at__gte=start_date, created_at__lte=end_date)
+            .annotate(period=trunc_func("created_at"))
+            .values("period")
+            .annotate(count=Count("id"))
+            .order_by("period")
+        )
+
+        data = {user["period"].strftime(date_format): user["count"] for user in users}
+        return Response(data)

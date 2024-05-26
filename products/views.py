@@ -11,7 +11,7 @@ from django.http import QueryDict
 from .pagination import FilterPagination, ProductsPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from users.permessions import IsAdmin, IsSuperAdmin
-from products.notification import add_notidication
+from products.notification import add_notification
 from config.storage_backends import MediaDelete, MediaStorage
 
 
@@ -152,6 +152,8 @@ class ProductUploadView(generics.CreateAPIView):
                 )
                 product = serializer.save()
                 product.genere.set(geners)
+                msg = f"{product.title} is under review."
+                notification = add_notification(product.customer, msg)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -318,6 +320,49 @@ class NotificationListView(generics.ListAPIView):
         return Notification.objects.filter(recipient=user).order_by("-id")
 
 
+import json
+
+
+class NotificationStatusUpdate(APIView):
+    serializer_class = NotificationAddSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def update_notification(self, model, data):
+        serializer = self.serializer_class(model, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return serializer
+
+    def put(self, request, *args, **kwargs):
+        notification_ids = request.GET.get("id")
+        request.data["is_read"] = json.loads(request.data["is_read"])
+
+        if notification_ids.startswith("["):
+            notification_ids = eval(notification_ids)
+        else:
+            notification_ids = [notification_ids]
+
+        notifications = Notification.objects.filter(id__in=notification_ids)
+        if not notifications.exists():
+            return Response(
+                {"error": "Notifications not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        updated_notifications = []
+        for notification in notifications:
+            try:
+                updated_notification = self.update_notification(
+                    notification, request.data
+                )
+                updated_notifications.append(updated_notification.data)
+            except serializers.ValidationError as e:
+                return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            {"success": "Data Updated", "updated_notifications": updated_notifications}
+        )
+
+
 ##################################################### ADMIN API ###############################################################
 
 
@@ -349,11 +394,7 @@ class ApproveProductAPI(generics.UpdateAPIView):
         if serializer.is_valid():
             serializer.save()
             msg = f"{product.title} has been {request.data['status']}."
-            notification = add_notidication(product.customer, msg)
-            if notification == None:
-                print("*********************Notification not created")
-            else:
-                print("*********************Notification created")
+            notification = add_notification(product.customer, msg)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
