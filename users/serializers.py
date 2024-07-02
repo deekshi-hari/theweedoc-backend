@@ -134,6 +134,10 @@ class UserProductSerializer(serializers.ModelSerializer):
     dislike_count = serializers.SerializerMethodField()
     has_liked = serializers.SerializerMethodField()
     has_disliked = serializers.SerializerMethodField()
+    language = serializers.SerializerMethodField()
+
+    def get_language(self, obj):
+        return obj.languages.name
 
     def get_like_count(self, obj):
         return obj.likes.count()
