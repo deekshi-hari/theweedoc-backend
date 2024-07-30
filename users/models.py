@@ -47,3 +47,11 @@ class UserOTP(models.Model):
     otp = models.PositiveBigIntegerField()
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)
+
+
+class ContactUs(models.Model):
+    name = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    contact = models.CharField(max_length=13, blank=True, null=True)
+    query = models.TextField(blank=True, null=True)
+    resolved = models.BooleanField(default=False)

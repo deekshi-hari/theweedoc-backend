@@ -47,4 +47,8 @@ urlpatterns = [
         ListUserRegistrations.as_view(),
         name="user-registrations",
     ),
+    # ================================ Contact Us =============================================
+    path("api/contact-us/query/"),
+    path("api/list/received-queries/"),
+    path("api/update/query/status/"),
 ]

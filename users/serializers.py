@@ -1,7 +1,7 @@
 from rest_framework import serializers
 import random
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import User, UserOTP
+from .models import User, UserOTP, ContactUs
 from django.db.models import OuterRef, Subquery
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
@@ -251,3 +251,9 @@ class AdminUserListSerializer(serializers.ModelSerializer):
             "phone_number",
             "user_type",
         )
+
+
+class ContactUsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactUs
+        fields = "__all__"
