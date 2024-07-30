@@ -125,7 +125,7 @@ class UserSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "profile_pic", "designation", "is_following"]
+        fields = ["id", "username", "profile_pic", "designation", "is_following", "email","created_at"]
 
 
 class UserProductSerializer(serializers.ModelSerializer):
