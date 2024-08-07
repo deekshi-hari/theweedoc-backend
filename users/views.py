@@ -254,7 +254,7 @@ class UserDelete(generics.DestroyAPIView):
 class UserSearchView(generics.ListAPIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSearchSerializer
-    queryset = User.objects.all()
+    queryset = User.objects.exclude(email="")
     pagination_class = FilterPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ["username", "first_name", "last_name"]

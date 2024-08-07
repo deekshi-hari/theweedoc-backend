@@ -114,6 +114,10 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 class UserSearchSerializer(serializers.ModelSerializer):
     is_following = serializers.SerializerMethodField()
+    followers = serializers.SerializerMethodField()
+
+    def get_followers(self, obj):
+        return obj.followers.count()
 
     def get_is_following(self, obj):
         if self.context["request"].user.is_authenticated:
@@ -125,7 +129,7 @@ class UserSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "profile_pic", "designation", "is_following", "email","created_at"]
+        fields = ["id", "username", "profile_pic", "designation", "is_following", "email","created_at", "followers"]
 
 
 class UserProductSerializer(serializers.ModelSerializer):
