@@ -93,3 +93,15 @@ class Notification(models.Model):
 class PrefferedLanguages(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     language = models.ForeignKey(Languages, on_delete=models.CASCADE)
+
+
+class ViewsCount(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    count = models.BigIntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product_id"], name="views_constraint"
+            )
+        ]

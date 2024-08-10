@@ -8,6 +8,7 @@ from .models import (
     SavedMovies,
     Review,
     Notification,
+    ViewsCount,
 )
 from users.models import User
 
@@ -85,6 +86,13 @@ class ProductRetriveSerializer(serializers.ModelSerializer):
     review_count = serializers.SerializerMethodField()
     video_quality = serializers.SerializerMethodField()
     language = serializers.SerializerMethodField()
+    views = serializers.SerializerMethodField()
+
+    def get_views(self, obj):
+        try:
+            return ViewsCount.objects.get(product=obj).count
+        except ViewsCount.DoesNotExist:
+            return 0
 
     def get_language(self, obj):
         return obj.languages.name

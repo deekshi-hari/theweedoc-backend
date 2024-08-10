@@ -49,6 +49,7 @@ urlpatterns = [
         NotificationStatusUpdate.as_view(),
         name="undate-notifications",
     ),
+    path("api/fetch/update/views-count/", ProductViews.as_view()),
     ####################################### ADMIN API ####################################################
     path("api/admin/products/", ProductListAdmin.as_view(), name="admin-product-list"),
     path("api/admin/product/status/", ApproveProductAPI.as_view(), name="admin-pt"),

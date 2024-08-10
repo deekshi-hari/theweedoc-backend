@@ -4,7 +4,7 @@ from rest_framework import generics, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import PrefferedLanguages, Product, Genere, Review, SavedMovies
+from .models import PrefferedLanguages, Product, Genere, Review, SavedMovies, ViewsCount
 from .serializers import *
 from users.cloudinary_utils import upload_files
 from django.http import QueryDict
@@ -477,3 +477,20 @@ class MostLikedProduct(APIView):
     def get(self, request, *args, **kwargs):
         product = Product.custom_objects.get_is_active().order_by("-likes")[:15]
         return Response(product.values("title", "likes"), status=status.HTTP_200_OK)
+
+
+class ProductViews(APIView):
+
+    def post(self,request,  *args, **kwargs):
+        count = request.data.get("count")
+        product_id = request.data.get("product_id")
+        try:
+            obj = ViewsCount.objects.get(product_id=product_id)
+            obj.count += count
+            obj.save()
+        except ViewsCount.DoesNotExist:
+            try:
+                obj = ViewsCount.objects.create(**request.data)
+            except Exception as e:
+                return Response({"error": str(e)})
+        return Response({"views":obj.count})
