@@ -334,12 +334,9 @@ class NotificationStatusUpdate(APIView):
         return serializer
 
     def put(self, request, *args, **kwargs):
-        notification_ids = request.GET.get("id")
-        request.data["is_read"] = json.loads(request.data["is_read"])
+        notification_ids = request.data["id"]
 
-        if notification_ids.startswith("["):
-            notification_ids = eval(notification_ids)
-        else:
+        if isinstance(notification_ids, int):
             notification_ids = [notification_ids]
 
         notifications = Notification.objects.filter(id__in=notification_ids)
