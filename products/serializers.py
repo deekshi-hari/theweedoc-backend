@@ -244,3 +244,14 @@ class LanguagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Languages
         fields = "__all__"
+
+
+
+
+class FollowerSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='first_name')
+    username = serializers.CharField(source='username')
+
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'username', 'profile_pic']

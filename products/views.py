@@ -360,6 +360,104 @@ class NotificationStatusUpdate(APIView):
         )
 
 
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import status
+from .models import Product, Notification, User  # Assuming these models are imported
+
+class ExtractMovieData(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def extract_title(self, content: str):
+        """
+        Extracts the title from the shared content and returns the product ID if found.
+        """
+        try:
+            title = content.replace(" has shared ", "--_--").replace(" for you to watch.", "").split("--_--")[-1]
+            product = Product.objects.filter(title=title).first()
+            
+            if not product:
+                raise ObjectDoesNotExist(f"Product with title '{title}' does not exist.")
+
+            return product.id
+
+        except ObjectDoesNotExist as e:
+            raise e
+        except Exception as e:
+            raise ValueError("Error extracting title from the message.") from e
+
+    def post(self, request, *args, **kwargs):
+        """
+        Receives content and returns the product ID.
+        """
+        try:
+            message = request.data.get("content")
+            if not message:
+                return Response({"detail": "Content is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            prod_id = self.extract_title(message)
+            return Response({"product_id": prod_id}, status=status.HTTP_200_OK)
+
+        except ObjectDoesNotExist as e:
+            return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"detail": "An error occurred while processing the request."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ShareMovies(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def generate_notification_msg(self, user_name, title):
+        """
+        Generates the notification message.
+        """
+        return f"{user_name} has shared {title} for you to watch."
+
+    def post(self, request, *args, **kwargs):
+        """
+        Sends a notification to a user with the movie details.
+        """
+        try:
+            product_id = request.data.get("prod_id")
+            to_user_id = request.data.get("user_id")
+            
+            if not product_id or not to_user_id:
+                return Response({"detail": "Product ID and User ID are required."}, status=status.HTTP_400_BAD_REQUEST)
+            product = Product.objects.get(id=product_id)
+            to_user = User.objects.get(id=to_user_id)
+            title = product.title
+            user_name = request.user.get_full_name()
+            content = self.generate_notification_msg(user_name, title)
+            Notification.objects.create(recipient=to_user, content=content)
+
+            return Response({"detail": "Notification Sent to Follower!"}, status=status.HTTP_200_OK)
+
+        except Product.DoesNotExist:
+            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+        except User.DoesNotExist:
+            return Response({"detail": "Recipient user not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"detail": "Failed to share the movie."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class UserFollowersAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        followers = user.followers.all()
+        serializer = FollowerSerializer(followers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 ##################################################### ADMIN API ###############################################################
 
 

@@ -50,6 +50,9 @@ urlpatterns = [
         name="undate-notifications",
     ),
     path("api/fetch/update/views-count/", ProductViews.as_view()),
+    path("api/share/movie/", ShareMovies.as_view()),
+    path("api/fetch/product/id/", ExtractMovieData.as_view()),
+    path("api/list/followers/to-share/", UserFollowersAPIView.as_view()),
     ####################################### ADMIN API ####################################################
     path("api/admin/products/", ProductListAdmin.as_view(), name="admin-product-list"),
     path("api/admin/product/status/", ApproveProductAPI.as_view(), name="admin-pt"),
