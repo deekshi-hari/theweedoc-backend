@@ -26,24 +26,28 @@ class ProductListAPIView(generics.ListAPIView):
     def get_queryset(self):
         try:
             user = self.request.user
-            lang = list(
-                PrefferedLanguages.objects.filter(user=user).values_list(
-                    "language_id", flat=True
+            if user.is_authenticated:
+                lang = list(
+                    PrefferedLanguages.objects.filter(user=user).values_list(
+                        "language_id", flat=True
+                    )
                 )
-            )
-            prod = Product.objects.filter(
-                languages__in=lang, status="approved"
-            ).order_by("-created_at")
-            rem = (
-                Product.objects.filter(status="approved")
-                .exclude(languages__in=lang)
-                .order_by("-created_at")
-            )
-            if not self.request.GET.get("search", None):
-                combined = prod.union(rem)
-                return combined
+                prod = Product.objects.filter(
+                    languages__in=lang, status="approved"
+                ).order_by("-created_at")
+                rem = (
+                    Product.objects.filter(status="approved")
+                    .exclude(languages__in=lang)
+                    .order_by("-created_at")
+                )
+                if not self.request.GET.get("search", None):
+                    combined = prod.union(rem)
+                    return combined
+                else:
+                    return Product.custom_objects.get_is_active()
             else:
-                return Product.custom_objects.get_is_active()
+                queryset = Product.objects.filter(status="approved").order_by("?")
+                return queryset
         except:
             return Product.custom_objects.get_is_active()
 
