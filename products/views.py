@@ -52,6 +52,36 @@ class ProductListAPIView(generics.ListAPIView):
             return Product.custom_objects.get_is_active()
 
 
+class BannerProductList(APIView):
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if user.is_authenticated:
+            lang = list(
+                PrefferedLanguages.objects.filter(user=user).values_list(
+                    "language_id", flat=True
+                )
+            )
+            prod = Product.objects.filter(
+                languages__in=lang, status="approved"
+            ).order_by("-created_at")
+
+            if prod.count() >= 5:
+                combined = prod[:5]
+            else:
+                rem = (
+                    Product.objects.filter(status="approved")
+                    .exclude(languages__in=lang)
+                    .order_by("-created_at")
+                )
+                combined = prod.union(rem)[:5]
+        else:
+            combined = Product.objects.filter(status="approved").order_by("-created_at")[:5]
+        response = ProductRetriveSerializer(combined, many=True, context={"request": request}).data
+        return Response(response)
+
+
+
 class ProductDetailView(generics.RetrieveAPIView):
     permission_classes = (AllowAny,)
     queryset = Product.objects.all()
