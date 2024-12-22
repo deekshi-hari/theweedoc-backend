@@ -32,52 +32,56 @@ class ProductListAPIView(generics.ListAPIView):
                         "language_id", flat=True
                     )
                 )
-                prod = Product.objects.filter(
+                followers_videos = Product.objects.filter(
+                    customer__in=user.followers.all(), status="approved"
+                ).order_by("-created_at")[:5]
+                preferred_language_videos = Product.objects.filter(
                     languages__in=lang, status="approved"
                 ).order_by("-created_at")
-                rem = (
-                    Product.objects.filter(status="approved")
-                    .exclude(languages__in=lang)
-                    .order_by("-created_at")
+                remaining_videos = Product.objects.filter(
+                    status="approved"
+                ).exclude(languages__in=lang).order_by("-created_at")
+                combined = followers_videos.union(
+                    preferred_language_videos, remaining_videos, all=True
                 )
                 if not self.request.GET.get("search", None):
-                    combined = prod.union(rem)
                     return combined
                 else:
                     return Product.custom_objects.get_is_active()
             else:
                 queryset = Product.objects.filter(status="approved").order_by("?")
                 return queryset
-        except:
+        except Exception as e:
+            print(f"Error in get_queryset: {e}")
             return Product.custom_objects.get_is_active()
+
 
 
 class BannerProductList(APIView):
 
     def get(self, request, *args, **kwargs):
-        # user = request.user
-        # if user.is_authenticated:
-        #     lang = list(
-        #         PrefferedLanguages.objects.filter(user=user).values_list(
-        #             "language_id", flat=True
-        #         )
-        #     )
-        #     prod = Product.objects.filter(
-        #         languages__in=lang, status="approved"
-        #     ).order_by("-created_at")
-
-        #     if prod.count() >= 5:
-        #         combined = prod[:5]
-        #     else:
-        #         rem = (
-        #             Product.objects.filter(status="approved")
-        #             .exclude(languages__in=lang)
-        #             .order_by("-created_at")
-        #         )
-        #         combined = prod.union(rem)[:5]
-        # else:
-        combined = Product.objects.filter(status="approved").order_by("-created_at")[:5]
-        response = ProductRetriveSerializer(combined, many=True, context={"request": request}).data
+        user = request.user
+        if user.is_authenticated:
+            lang = list(
+                PrefferedLanguages.objects.filter(user=user).values_list(
+                    "language_id", flat=True
+                )
+            )
+            prod = Product.objects.filter(
+                languages__in=lang, status="approved"
+            ).order_by("-created_at")
+            if prod.count() >= 5:
+                combined = prod[:5]
+            else:
+                rem = (
+                    Product.objects.filter(status="approved")
+                    .exclude(languages__in=lang)
+                    .order_by("-created_at")
+                )
+                combined = prod.union(rem)[:5]
+        else:
+            combined = Product.objects.filter(status="approved").order_by("-created_at")[:5]
+            response = ProductRetriveSerializer(combined, many=True, context={"request": request}).data
         return Response(response)
 
 
