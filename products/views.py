@@ -81,7 +81,7 @@ class BannerProductList(APIView):
                 combined = prod.union(rem)[:5]
         else:
             combined = Product.objects.filter(status="approved").order_by("-created_at")[:5]
-            response = ProductRetriveSerializer(combined, many=True, context={"request": request}).data
+        response = ProductRetriveSerializer(combined, many=True, context={"request": request}).data
         return Response(response)
 
 
