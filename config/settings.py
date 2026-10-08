@@ -168,15 +168,15 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 
-EMAIL_HOST_USER = "hi@theweedoc.com"
-# EMAIL_HOST_PASSWORD = "tzcozhioilxnplyo"
+EMAIL_HOST_USER = "foo@bar.com"
+# EMAIL_HOST_PASSWORD = "foobar"
 EMAIL_HOST_PASSWORD = os.getenv("SMTP_PASSWORD")
 
 
 # EMAIL_HOST = 'smtp.office365.com'
 # EMAIL_HOST_USER = 'Theweedoc@outlook.com'
-# EMAIL_HOST_PASSWORD = 'Clovercloverclover3'
-# EMAIL_HOST_PASSWORD = 'tsfrcxjatrmwkngb' #fehdtmpghxqeqqxu
+# EMAIL_HOST_PASSWORD = 'foo'
+# EMAIL_HOST_PASSWORD = 'bar'
 
 
 CLOUDINARY = {
@@ -188,7 +188,7 @@ CLOUDINARY = {
 CORS_ORIGIN_ALLOW_ALL = True
 
 # CORS_ORIGIN_WHITELIST = [
-#     'https://jellyfish-app-7fj7c.ondigitalocean.app/',
+#     '',
 # ]
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1048576000  # 1000MB
